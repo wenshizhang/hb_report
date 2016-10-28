@@ -5,23 +5,27 @@
 # Created Time: Wed 26 Oct 2016 11:28:22 AM CST
 # Description:
 #########################################################################
+import	os
 import	datetime
 import	sys
 import	getopt
+import	envir
 
 from crmsh	import logtime
 from crmsh	import utils
 from crmsh	import logparser
-from envir	import envir
 from node	import node
 
 class master(node):
 	SUDO = ''
 	LOCAL_SUDO = ''
-	ENVIRONMENT = envir
 	COLLECTOR_PIDS =[]
 
-	def usage(msg = ''):
+	def version(self):
+		print "crmsh: 2.2.0+git.1464769043.9e4df55"
+		sys.exit
+
+	def usage(self,msg = ''):
 		print '''
 usage: report -f {time|"cts:"testnum} [-t time]
        [-u user] [-X ssh-options] [-l file] [-n nodes] [-E files]
@@ -31,7 +35,7 @@ usage: report -f {time|"cts:"testnum} [-t time]
 	-t time: time to finish at (dflt: now)
 	-d     : don't compress, but leave result in a directory
 	-n nodes: node names for this cluster; this option is additive
-	         (use either -n "a b" or -n a -n b)
+			 (use either -n "a b" or -n a -n b)
 	         if you run report on the loghost or use autojoin,
 	         it is highly recommended to set this option
 	-u user: ssh user to access other nodes (dflt: empty, root, hacluster)
@@ -96,14 +100,38 @@ usage: report -f {time|"cts:"testnum} [-t time]
 
 			'''
 
-	def __init__(self,envir):
-		self.ENVIRONMRNT = envir
 
 	def analyzed_argvment(self,argv):
-		opt,argv = getopt.getopt(sys.argv[1:],"dMQASZVvhDC:f:t:n:l:E:e")
-		print opt
-		print argv
-		self.usage()
+		opt,arg = getopt.getopt(sys.argv[1:],"dMQASZVvhDCu:f:t:n:l:E:e:X:")
+		if(len(arg)>1):
+			self.usage("short")
+			sys.exit()
+
+		if(len(arg) == 1):
+			envir.DEST = arg
+		for args,option in opt:
+			if (args == '-f'):
+				envir.FROM_TIME = self.change_to_timestamp(option)
+			if (args == '-t'):
+				envir.TO_TIME  = self.change_to_timestamp(option)
+			if (args == '-n'):
+				envir.NODE_SOURCE = 'user'
+				for i in option.split(' '):
+					envir.USER_NODES.append(i)
+				print envir.NODE_SOURCE, envir.USER_NODES
+			if (args == '-h'):
+				self.usage()
+			if (args == '-u'):
+				envir.SSH_USER.append(option)
+			if (args == '-X'):
+				envir.SSH_OPTS = envir.SSH_OPTS+option
+			if (args == '-l'):
+				envir.HA_LOG = option
+			if(a)
+
+			envir.SSH_USER.append("root")
+			envir.SSH_USER.append("hacluster")
+
 
 	def mktemp(self,s):
 		pass
@@ -117,8 +145,9 @@ usage: report -f {time|"cts:"testnum} [-t time]
 	def find_sudo(self):
 		pass
 
-	def change_time(self):
-		pass
+	def change_to_timestamp(self,time):
+		ds = utils.parse_to_timestamp(time)
+		return ds
 
 	def collect_for_nodes(self):
 		pass
@@ -148,8 +177,7 @@ def run():
 	'''
 	This method do most of the job that master node should do
 	'''
-	env = envir()
-	mtr = master(env)
+	mtr = master()
 	mtr.analyzed_argvment(sys.argv)
 
 

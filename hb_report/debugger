@@ -1,0 +1,2025 @@
++ . /usr/lib/ocf/lib/heartbeat/ocf-shellfuncs
+++ unset LC_ALL
+++ export LC_ALL
+++ unset LANGUAGE
+++ export LANGUAGE
++++ basename /usr/share/crmsh/hb_report/hb_report
+++ __SCRIPT_NAME=hb_report
+++ '[' -z '' ']'
+++ : /usr/lib/ocf
+++ '[' '' = /usr/lib/ocf/resource.d/heartbeat ']'
+++ : /usr/lib/ocf/lib/heartbeat
+++ . /usr/lib/ocf/lib/heartbeat/ocf-binaries
++++ PATH=/sbin:/usr/sbin:/usr/local/sbin:/root/bin:/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games:/sbin:/bin:/usr/sbin:/usr/bin
++++ PATH=/sbin:/usr/sbin:/usr/local/sbin:/root/bin:/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games:/sbin:/bin:/usr/sbin:/usr/bin:/usr/ucb
++++ export PATH
++++ : gawk
++++ : /usr/bin/grep -E
++++ : -a
++++ : mail
++++ : /bin/ping
++++ : /bin/sh
++++ : /usr/bin/test
++++ : /usr/bin/test
++++ : basename
++++ : blockdev
++++ : cat
++++ : fsck
++++ : fuser
++++ : getent
++++ : grep
++++ : ifconfig
++++ : iptables
++++ : ip
++++ : mdadm
++++ : modprobe
++++ : mount
++++ : msgfmt
++++ : netstat
++++ : perl
++++ : python
++++ : raidstart
++++ : raidstop
++++ : route
++++ : umount
++++ : reboot
++++ : poweroff
++++ : wget
++++ : whoami
++++ : strings
++++ : scp
++++ : ssh
++++ : swig
++++ : gzip
++++ : tar
++++ : md5
++++ : drbdadm
++++ : drbdsetup
+++ . /usr/lib/ocf/lib/heartbeat/ocf-returncodes
++++ OCF_SUCCESS=0
++++ OCF_ERR_GENERIC=1
++++ OCF_ERR_ARGS=2
++++ OCF_ERR_UNIMPLEMENTED=3
++++ OCF_ERR_PERM=4
++++ OCF_ERR_INSTALLED=5
++++ OCF_ERR_CONFIGURED=6
++++ OCF_NOT_RUNNING=7
++++ OCF_RUNNING_MASTER=8
++++ OCF_FAILED_MASTER=9
+++ . /usr/lib/ocf/lib/heartbeat/ocf-directories
++++ prefix=/usr
++++ exec_prefix=/usr
++++ : /etc/init.d
++++ : /etc/ha.d
++++ : /etc/ha.d/rc.d
++++ : /etc/ha.d/conf
++++ : /etc/ha.d/ha.cf
++++ : /var/lib/heartbeat
++++ : /run/resource-agents
++++ : /var/run/heartbeat/rsctmp
++++ : /var/lib/heartbeat/fifo
++++ : /usr/lib64/heartbeat
++++ : /usr/sbin
++++ : %Y/%m/%d_%T
++++ : /dev/null
++++ : /etc/ha.d/resource.d
++++ : /usr/share/doc/heartbeat
++++ : hb_report
++++ : /var/run
++++ : /var/lock/subsys
+++ . /usr/lib/ocf/lib/heartbeat/ocf-rarun
+++ . /usr/lib/ocf/lib/heartbeat/ocf-distro
++++ _DEBIAN_VERSION_FILE=/etc/debian_version
++++ _REDHAT_RELEASE_FILE=/etc/redhat-release
++++ _SUSE_RELEASE_FILE=/etc/SuSE-release
++++ _RELEASE_FILES='/etc/*-release'
++++ _REDHAT_BASED_DISTROS_RE='red *hat|fedora|centos|scientific linux'
+++ : 0
+++ __ocf_set_defaults -f 3:00 -t 4:00 -n shiwen1 report
+++ __OCF_ACTION=-f
+++ unset LANG
+++ LC_ALL=C
+++ export LC_ALL
+++ '[' -z '' ']'
+++ : 0
+++ '[' '!' -d /usr/lib/ocf ']'
+++ '[' -z '' ']'
+++ : hb_report
+++ '[' x-f = xmeta-data ']'
+++ '[' -z '' ']'
+++ : We are being invoked as an init script.
+++ : Fill in some things with reasonable values.
+++ : default
+++ return 0
+++ :
+++ ocf_is_true ''
+++ case "$1" in
+++ false
+++ ocf_is_true ''
+++ case "$1" in
+++ false
++ prefix=/usr
++ datarootdir=/usr/share
++ datadir=/usr/share
++ HA_NOARCHBIN=/usr/share/crmsh/hb_report
++ . /usr/share/crmsh/hb_report/utillib.sh
++ unset LANG
++ export LC_ALL=POSIX
++ LC_ALL=POSIX
++ PROG=report
++ DEFAULT_HA_LOGFACILITY=daemon
++ export DEFAULT_HA_LOGFACILITY
+++ findlogdcf /etc /etc/ha.d
+++ local f
++++ test -x /usr/lib64/heartbeat/ha_logd
++++ which strings
++++ strings /usr/lib64/heartbeat/ha_logd
++++ grep 'logd\.cf'
++++ for d in '"$@"'
++++ echo /etc/logd.cf /etc/ha_logd.cf
++++ for d in '"$@"'
++++ echo /etc/ha.d/logd.cf /etc/ha.d/ha_logd.cf
+++ for f in '`test -x $HA_BIN/ha_logd &&
+			which strings > /dev/null 2>&1 &&
+			strings $HA_BIN/ha_logd | grep '\''logd\.cf'\''`' '`for d; do echo $d/logd.cf $d/ha_logd.cf; done`'
+++ '[' -f /etc/logd.cf ']'
+++ for f in '`test -x $HA_BIN/ha_logd &&
+			which strings > /dev/null 2>&1 &&
+			strings $HA_BIN/ha_logd | grep '\''logd\.cf'\''`' '`for d; do echo $d/logd.cf $d/ha_logd.cf; done`'
+++ '[' -f /etc/logd.cf ']'
+++ for f in '`test -x $HA_BIN/ha_logd &&
+			which strings > /dev/null 2>&1 &&
+			strings $HA_BIN/ha_logd | grep '\''logd\.cf'\''`' '`for d; do echo $d/logd.cf $d/ha_logd.cf; done`'
+++ '[' -f /etc/ha_logd.cf ']'
+++ for f in '`test -x $HA_BIN/ha_logd &&
+			which strings > /dev/null 2>&1 &&
+			strings $HA_BIN/ha_logd | grep '\''logd\.cf'\''`' '`for d; do echo $d/logd.cf $d/ha_logd.cf; done`'
+++ '[' -f /etc/ha.d/logd.cf ']'
+++ for f in '`test -x $HA_BIN/ha_logd &&
+			which strings > /dev/null 2>&1 &&
+			strings $HA_BIN/ha_logd | grep '\''logd\.cf'\''`' '`for d; do echo $d/logd.cf $d/ha_logd.cf; done`'
+++ '[' -f /etc/ha.d/ha_logd.cf ']'
+++ debug 'no logd.cf'
+++ '[' '' ']'
+++ return 0
+++ return 1
++ LOGD_CF=
++ export LOGD_CF
++ SSH_PASSWORD_NODES=
++ : -o StrictHostKeyChecking=no -o EscapeChar=none -o ConnectTimeout=15
++ LOG_PATTERNS='CRIT: ERROR:'
++ EVENT_PATTERNS='
+membership crmd.*(NEW|LOST)|pcmk.*(lost|memb|LOST|MEMB):
+quorum crmd.*Updating.quorum.status|crmd.*quorum.(lost|ac?quir)
+pause Process.pause.detected
+resources lrmd.*(start|stop)
+stonith crmd.*Exec|stonith-ng.*log_oper.*reboot|stonithd.*(requests|(Succeeded|Failed).to.STONITH|result=)
+start_stop Configuration.validated..Starting.heartbeat|Corosync.Cluster.Engine|Executive.Service.RELEASE|Requesting.shutdown|Shutdown.complete
+'
++ init_tmpfiles
+++ mktemp
++ __TMPFLIST=/tmp/tmp.ixqgNYepUb
++ drop_tmpfiles
++ trap 'rm -rf `cat $__TMPFLIST`; rm $__TMPFLIST' EXIT
++ '[' x-f = x__slave ']'
++ '[' 7 -eq 0 ']'
++ NO_str2time=
+++ str2time 12:00
+++ perl -e '$time='\''12:00'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++ t=1477627200
++ '[' 1477627200 = '' ']'
++ which which
+++ uname -n
++ WE=shiwen1
+++ mktemp -t -d .hb_report.workdir.XXXXXX
++ tmpdir=/tmp/.hb_report.workdir.ZWWqvU
++ add_tmpfiles /tmp/.hb_report.workdir.ZWWqvU
++ test -f /tmp/tmp.ixqgNYepUb
++ echo /tmp/.hb_report.workdir.ZWWqvU
++ WORKDIR=/tmp/.hb_report.workdir.ZWWqvU
++ is_collector
++ test ''
++ setvarsanddefaults
+++ perl -e 'print time()'
++ local now=1477637935
++ DEST=
++ FROM_TIME=
++ CTS=
++ TO_TIME=0
++ HA_LOG=
++ UNIQUE_MSG=Mark:HB_REPORT:1477637935
++ SANITIZE='passw.*'
++ DO_SANITIZE=
++ FORCE_REMOVE_DEST=
++ COMPRESS=1
++ EXTRA_LOGS='/var/log/messages /var/log/pacemaker.log'
++ PCMK_LOG=/var/log/pacemaker.log
++ NO_SSH=
++ SSH_USER=
++ TRY_SSH='root hacluster'
++ SLAVEPIDS=
++ NO_DESCRIPTION=1
++ SKIP_LVL=0
++ VERBOSITY=0
++ userargs='-f 3:00 -t 4:00 -n shiwen1 report'
++ DESTDIR=.
+++ date +%a-%d-%b-%Y
++ DEST=hb_report-Fri-28-Oct-2016
++ getopts f:t:l:u:X:p:L:e:E:n:MSDCZAVsvhdQ o
++ case "$o" in
++ echo 3:00
++ grep -qs '^cts:'
+++ str2time 3:00
+++ perl -e '$time='\''3:00'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++ FROM_TIME=1477594800
++ chktime 1477594800 3:00
++ '[' 1477594800 ']'
++ getopts f:t:l:u:X:p:L:e:E:n:MSDCZAVsvhdQ o
++ case "$o" in
+++ str2time 4:00
+++ perl -e '$time='\''4:00'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++ TO_TIME=1477598400
++ chktime 1477598400 4:00
++ '[' 1477598400 ']'
++ getopts f:t:l:u:X:p:L:e:E:n:MSDCZAVsvhdQ o
++ case "$o" in
++ NODES_SOURCE=user
++ USER_NODES=' shiwen1'
++ getopts f:t:l:u:X:p:L:e:E:n:MSDCZAVsvhdQ o
++ shift 6
++ '[' 1 -gt 1 ']'
++ set_dest report
++ '[' 1 -eq 1 ']'
+++ basename report
++ DEST=report
+++ dirname report
+++ local a
+++ local b
+++ '[' 1 = 1 ']'
+++ a=report
+++ '[' 1 ']'
+++ b=report
+++ '[' report = report ']'
+++ break
+++ b=report
+++ '[' -z report -o report = report ']'
+++ b=.
+++ echo .
+++ return 0
++ DESTDIR=.
++ chkname report
++ '[' report ']'
++ echo report
++ grep -qs '[^a-zA-Z0-9@_+=:.-]'
++ '[' -z 1 -a -e ./report ']'
++ '[' 1477594800 ']'
++ WORKDIR=/tmp/.hb_report.workdir.ZWWqvU/report
++ mkdir -p /tmp/.hb_report.workdir.ZWWqvU/report
++ '[' -d /tmp/.hb_report.workdir.ZWWqvU/report ']'
++ is_collector
++ test ''
++ '[' 0 -gt 1 ']'
++ compatibility_pcmk
++ get_crm_daemon_dir
++ local libdir p
+++ dirname /usr/lib64/heartbeat
+++ local a
+++ local b
+++ '[' 1 = 1 ']'
+++ a=/usr/lib64/heartbeat
+++ '[' 1 ']'
+++ b=/usr/lib64/heartbeat
+++ '[' /usr/lib64/heartbeat = /usr/lib64/heartbeat ']'
+++ break
+++ b=/usr/lib64
+++ '[' -z /usr/lib64 -o /usr/lib64/heartbeat = /usr/lib64 ']'
+++ echo /usr/lib64
+++ return 0
++ libdir=/usr/lib64
++ for p in pacemaker heartbeat
++ '[' -x /usr/lib64/pacemaker/crmd ']'
++ debug 'setting CRM_DAEMON_DIR to /usr/lib64/pacemaker'
++ '[' 0 ']'
++ '[' 0 -gt 0 ']'
++ return 0
++ CRM_DAEMON_DIR=/usr/lib64/pacemaker
++ return 0
++ '[' '!' -d /usr/lib64/pacemaker ']'
++ get_pe_state_dir
+++ python -c 'import crmsh.config; print crmsh.config.path.pe_state_dir'
++ PE_STATE_DIR=/var/lib/pacemaker/pengine
++ test -d /var/lib/pacemaker/pengine
++ get_cib_dir
+++ python -c 'import crmsh.config; print crmsh.config.path.crm_config'
++ CIB_DIR=/var/lib/pacemaker/cib
++ test -d /var/lib/pacemaker/cib
+++ dirname /var/lib/pacemaker/cib
+++ local a
+++ local b
+++ '[' 1 = 1 ']'
+++ a=/var/lib/pacemaker/cib
+++ '[' 1 ']'
+++ b=/var/lib/pacemaker/cib
+++ '[' /var/lib/pacemaker/cib = /var/lib/pacemaker/cib ']'
+++ break
+++ b=/var/lib/pacemaker
+++ '[' -z /var/lib/pacemaker -o /var/lib/pacemaker/cib = /var/lib/pacemaker ']'
+++ echo /var/lib/pacemaker
+++ return 0
++ debug 'setting PCMK_LIB to /var/lib/pacemaker'
++ '[' 0 ']'
++ '[' 0 -gt 0 ']'
++ return 0
+++ dirname /var/lib/pacemaker/cib
+++ local a
+++ local b
+++ '[' 1 = 1 ']'
+++ a=/var/lib/pacemaker/cib
+++ '[' 1 ']'
+++ b=/var/lib/pacemaker/cib
+++ '[' /var/lib/pacemaker/cib = /var/lib/pacemaker/cib ']'
+++ break
+++ b=/var/lib/pacemaker
+++ '[' -z /var/lib/pacemaker -o /var/lib/pacemaker/cib = /var/lib/pacemaker ']'
+++ echo /var/lib/pacemaker
+++ return 0
++ PCMK_LIB=/var/lib/pacemaker
+++ echo_ptest_tool
+++ local f ptest_progs
+++ ptest_progs='crm_simulate ptest'
+++ for f in '$ptest_progs'
+++ which crm_simulate
+++ break
++ PTEST=/usr/sbin/crm_simulate
++ export PE_STATE_DIR CIB_DIR CRM_DAEMON_DIR PCMK_LIB PTEST
++ '[' -z '' ']'
+++ get_cluster_type
+++ ps -ef
+++ egrep -qs '[a]isexec|[c]orosync'
+++ debug 'this is OpenAIS cluster stack'
+++ '[' 0 ']'
+++ '[' 0 -gt 0 ']'
+++ return 0
+++ echo openais
++ CLUSTER_TYPE=openais
+++ ls -d /var/lib/heartbeat/cores /var/lib/pacemaker/cores
+++ uniq
++ CORES_DIRS='/var/lib/heartbeat/cores
+/var/lib/pacemaker/cores'
++ PACKAGES='pacemaker libpacemaker3 
+pacemaker-pygui pacemaker-pymgmt pymgmt-client
+openais libopenais2 libopenais3 corosync libcorosync4
+resource-agents cluster-glue libglue2 ldirectord libqb0
+heartbeat heartbeat-common heartbeat-resources libheartbeat2
+booth
+ocfs2-tools ocfs2-tools-o2cb ocfs2console
+ocfs2-kmp-default ocfs2-kmp-pae ocfs2-kmp-xen ocfs2-kmp-debug ocfs2-kmp-trace
+drbd drbd-kmp-xen drbd-kmp-pae drbd-kmp-default drbd-kmp-debug drbd-kmp-trace
+drbd-heartbeat drbd-pacemaker drbd-utils drbd-bash-completion drbd-xen
+lvm2 lvm2-clvm cmirrord
+libdlm libdlm2 libdlm3
+hawk ruby lighttpd
+kernel-default kernel-pae kernel-xen
+glibc
+'
++ case "$CLUSTER_TYPE" in
++ CONF=/etc/corosync/corosync.conf
++ test -f /etc/corosync/corosync.conf
++ CORES_DIRS='/var/lib/heartbeat/cores
+/var/lib/pacemaker/cores /var/lib/corosync'
++ CF_SUPPORT=/usr/share/crmsh/hb_report/openais_conf_support.sh
++ MEMBERSHIP_TOOL_OPTS=
++ unset HOSTCACHE HB_UUID_F
+++ basename /etc/corosync/corosync.conf
++ B_CONF=corosync.conf
++ test -f /usr/share/crmsh/hb_report/openais_conf_support.sh
++ . /usr/share/crmsh/hb_report/openais_conf_support.sh
++ '[' x = x ']'
++ getlogvars
++ HA_LOGFACILITY=daemon
++ HA_LOGLEVEL=info
++ iscfvartrue debug
++ getcfvar debug
++ '[' -f /etc/corosync/corosync.conf ']'
++ egrep -qsi '^(true|y|yes|on|1)'
++ awk -v varname=debug '
+		NF==2 && match($1,varname":$")==1 { print $2; exit; }
+		'
++ '[' 1 -eq 2 ']'
++ cat
++ sed 's/#.*//'
++ uselogd
++ iscfvartrue use_logd
++ getcfvar use_logd
++ '[' -f /etc/corosync/corosync.conf ']'
++ egrep -qsi '^(true|y|yes|on|1)'
++ awk -v varname=use_logd '
+		NF==2 && match($1,varname":$")==1 { print $2; exit; }
+		'
++ '[' 1 -eq 2 ']'
++ cat
++ sed 's/#.*//'
++ debug 'reading log settings from /etc/corosync/corosync.conf'
++ '[' 0 ']'
++ '[' 0 -gt 0 ']'
++ return 0
++ get_ais_logvars
++ iscfvartrue to_file
++ getcfvar to_file
++ '[' -f /etc/corosync/corosync.conf ']'
++ egrep -qsi '^(true|y|yes|on|1)'
++ awk -v varname=to_file '
+		NF==2 && match($1,varname":$")==1 { print $2; exit; }
+		'
++ '[' 1 -eq 2 ']'
++ cat
++ sed 's/#.*//'
++ iscfvartrue to_syslog
++ getcfvar to_syslog
++ '[' -f /etc/corosync/corosync.conf ']'
++ egrep -qsi '^(true|y|yes|on|1)'
++ awk -v varname=to_syslog '
+		NF==2 && match($1,varname":$")==1 { print $2; exit; }
+		'
++ '[' 1 -eq 2 ']'
++ cat
++ sed 's/#.*//'
+++ getcfvar syslog_facility
+++ '[' -f /etc/corosync/corosync.conf ']'
+++ sed 's/#.*//'
+++ '[' 1 -eq 2 ']'
+++ cat
+++ awk -v varname=syslog_facility '
+		NF==2 && match($1,varname":$")==1 { print $2; exit; }
+		'
++ HA_LOGFACILITY=
++ HA_LOGFACILITY=daemon
++ debug 'log settings: facility=daemon logfile= debugfile='
++ '[' 0 ']'
++ '[' 0 -gt 0 ']'
++ return 0
++ ANALYSIS_F=analysis.txt
++ DESCRIPTION_F=description.txt
++ HALOG_F=ha-log.txt
++ JOURNAL_F=journal.log
++ BT_F=backtraces.txt
++ SYSINFO_F=sysinfo.txt
++ SYSSTATS_F=sysstats.txt
++ DLM_DUMP_F=dlm_dump.txt
++ TIME_F=time.txt
++ export ANALYSIS_F DESCRIPTION_F HALOG_F JOURNAL_F BT_F SYSINFO_F SYSSTATS_F DLM_DUMP_F TIME_F
++ CRM_MON_F=crm_mon.txt
++ MEMBERSHIP_F=members.txt
++ HB_UUID_F=hb_uuid.txt
++ HOSTCACHE=hostcache
++ CRM_VERIFY_F=crm_verify.txt
++ PERMISSIONS_F=permissions.txt
++ CIB_F=cib.xml
++ CIB_TXT_F=cib.txt
++ COROSYNC_RECORDER_F=fdata.txt
++ export CRM_MON_F MEMBERSHIP_F CRM_VERIFY_F CIB_F CIB_TXT_F HB_UUID_F PERMISSIONS_F
++ export COROSYNC_RECORDER_F
++ CONFIGURATIONS='/etc/drbd.conf /etc/drbd.d /etc/booth/booth.conf'
++ export CONFIGURATIONS
++ THIS_IS_NODE=
++ is_collector
++ test ''
+++ getnodes
+++ '[' ' shiwen1' ']'
+++ echo shiwen1
++ NODES=shiwen1
+++ echo shiwen1
++ debug 'nodes: shiwen1'
++ '[' 0 ']'
++ '[' 0 -gt 0 ']'
++ return 0
+++ echo shiwen1
+++ wc -w
++ NODECNT=1
++ '[' 1 = 0 ']'
++ echo shiwen1
++ grep -wqs shiwen1
++ THIS_IS_NODE=1
++ is_collector
++ test ''
++ is_node
++ test 1
++ '[' -z '' ']'
++ findsshuser
++ local n u rc
++ local ssh_s ssh_user=__undef try_user_list
++ '[' -z '' ']'
++ try_user_list='__default root hacluster'
++ for n in '$NODES'
++ rc=1
++ '[' shiwen1 = shiwen1 ']'
++ continue
++ '[' -n '' ']'
++ '[' __undef = __undef ']'
++ return 1
++ '[' -n '' ']'
++ SUDO=
+++ id -u
++ '[' -z '' -a 0 '!=' 0 ']'
++ '[' -n '' -a '' '!=' root ']'
++ LOCAL_SUDO=
+++ id -u
++ '[' 0 '!=' 0 ']'
++ is_collector
++ test ''
++ is_node
++ test 1
++ getlog
++ local outf
++ outf=/tmp/.hb_report.workdir.ZWWqvU/report/ha-log.txt
++ collect_journal 1477594800 1477598400 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++ local from_time to_time outf
++ from_time=1477594800
++ to_time=1477598400
++ outf=/tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++ which journalctl
++ isnumber 1477594800
++ echo 1477594800
++ grep -qs '^[0-9][0-9]*$'
++ '[' 1477594800 -eq 0 ']'
++ isnumber 1477594800
++ echo 1477594800
++ grep -qs '^[0-9][0-9]*$'
+++ echo 1477594800
+++ awk '{ print strftime("%Y-%m-%d %H:%M", $1); }'
++ from_time='2016-10-28 03:00'
++ isnumber 1477598400
++ echo 1477598400
++ grep -qs '^[0-9][0-9]*$'
++ '[' 1477598400 -eq 0 ']'
++ isnumber 1477598400
++ echo 1477598400
++ grep -qs '^[0-9][0-9]*$'
+++ echo 1477598400
+++ awk '{ print strftime("%Y-%m-%d %H:%M", $1); }'
++ to_time='2016-10-28 04:00'
++ '[' -f /tmp/.hb_report.workdir.ZWWqvU/report/journal.log ']'
++ debug 'journalctl from: '\''1477594800'\'' until: '\''1477598400'\'' from_time '\''2016-10-28 03:00'\'' to_time: '\''2016-10-28 04:00'\'' > /tmp/.hb_report.workdir.ZWWqvU/report/journal.log'
++ '[' 0 ']'
++ '[' 0 -gt 0 ']'
++ return 0
++ journalctl -o short-iso --since '2016-10-28 03:00' --until '2016-10-28 04:00' --no-pager
++ tail -n +2
++ '[' '' ']'
++ '[' '' = '' ']'
+++ findlog
+++ local logf=
+++ '[' daemon ']'
++++ findmsg Mark:HB_REPORT:1477637935
++++ local d syslogdirs favourites mark log
++++ syslogdirs='/var/log /var/logs /var/syslog /var/adm
+	/var/log/ha /var/log/cluster /var/log/pacemaker
+	/var/log/heartbeat /var/log/crm /var/log/corosync /var/log/openais'
++++ favourites='ha-*'
++++ awk '{print $1}'
++++ mark=Mark:HB_REPORT:1477637935
++++ log=
++++ '[' '' ']'
++++ '[' '' ']'
++++ debug 'no HA log found in /var/log /var/logs /var/syslog /var/adm
+	/var/log/ha /var/log/cluster /var/log/pacemaker
+	/var/log/heartbeat /var/log/crm /var/log/corosync /var/log/openais'
++++ '[' 0 ']'
++++ '[' 0 -gt 0 ']'
++++ return 0
+++ logf=
+++ '[' -f '' ']'
+++ '[' -f /tmp/.hb_report.workdir.ZWWqvU/report/journal.log ']'
+++ echo /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ return
++ HA_LOG=/tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++ '[' /tmp/.hb_report.workdir.ZWWqvU/report/journal.log = '' -o '!' -f /tmp/.hb_report.workdir.ZWWqvU/report/journal.log ']'
++ '[' '' ']'
++ '[' '' ']'
+++ find_getstampproc
+++ local t l func trycnt
+++ t=0
+++ l=
+++ func=
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
+++ read l
+++++ echo 2016-10-28T03:00:01+0800 shiwen1 'cron[17240]:' 'pam_unix(crond:session):' session opened for user root by '(uid=0)'
+++++ getstamp_syslog
+++++ awk '{print $1,$2,$3}'
++++ str2time 2016-10-28T03:00:01+0800 shiwen1 'cron[17240]:'
++++ perl -e '$time='\''2016-10-28T03:00:01+0800 shiwen1 cron[17240]:'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
+++ t=
+++ '[' '' ']'
+++++ getstamp_rfc5424
+++++ echo 2016-10-28T03:00:01+0800 shiwen1 'cron[17240]:' 'pam_unix(crond:session):' session opened for user root by '(uid=0)'
+++++ awk '{print $1}'
++++ str2time 2016-10-28T03:00:01+0800
++++ perl -e '$time='\''2016-10-28T03:00:01+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
+++ t=1477594801
+++ '[' 1477594801 ']'
+++ func=getstamp_rfc5424
+++ debug 'the log file is in the rfc5424 format'
+++ '[' 0 ']'
+++ '[' 0 -gt 0 ']'
+++ return 0
+++ break
+++ echo getstamp_rfc5424
++ getstampproc=getstamp_rfc5424
++ '[' getstamp_rfc5424 ']'
++ export getstampproc
++ dumplogset /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 1477594800 1477598400
++ local logf=/tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++ local from_time=1477594800
++ local to_time=1477598400
+++ arch_logs /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 1477594800 1477598400
+++ local next_log
+++ local logf=/tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ local from_time=1477594800
+++ local to_time=1477598400
+++ ls -t /tmp/.hb_report.workdir.ZWWqvU/report/journal.log '/tmp/.hb_report.workdir.ZWWqvU/report/journal.log*[0-9z]'
+++ read next_log
+++ is_our_log /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 1477594800 1477598400
+++ local logf=/tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ local from_time=1477594800
+++ local to_time=1477598400
++++ find_decompressor /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++++ echo /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++++ grep -qs 'bz2$'
++++ echo /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++++ grep -qs 'gz$'
++++ echo /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++++ grep -qs 'xz$'
++++ file /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++++ grep -qs text
++++ echo cat
+++ local cat=cat
++++ cat /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++++ head -10
++++ find_first_ts
++++ local l ts
++++ read l
+++++ get_ts '2016-10-28T03:00:01+0800 shiwen1 cron[17240]: pam_unix(crond:session): session opened for user root by (uid=0)'
+++++ local 'l=2016-10-28T03:00:01+0800 shiwen1 cron[17240]: pam_unix(crond:session): session opened for user root by (uid=0)' ts
+++++++ echo '2016-10-28T03:00:01+0800 shiwen1 cron[17240]: pam_unix(crond:session): session opened for user root by (uid=0)'
+++++++ getstamp_rfc5424
+++++++ awk '{print $1}'
++++++ str2time 2016-10-28T03:00:01+0800
++++++ perl -e '$time='\''2016-10-28T03:00:01+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
+++++ ts=1477594801
+++++ '[' -z 1477594801 ']'
+++++ echo 1477594801
++++ ts=1477594801
++++ '[' 1477594801 ']'
++++ break
++++ echo 1477594801
+++ local first_time=1477594801
++++ cat /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++++ find_first_ts
++++ local l ts
++++ read l
++++ tail -10
++++ tac
+++++ get_ts '2016-10-28T03:59:59+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
+++++ local 'l=2016-10-28T03:59:59+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)' ts
+++++++ echo '2016-10-28T03:59:59+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
+++++++ getstamp_rfc5424
+++++++ awk '{print $1}'
++++++ str2time 2016-10-28T03:59:59+0800
++++++ perl -e '$time='\''2016-10-28T03:59:59+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
+++++ ts=1477598399
+++++ '[' -z 1477598399 ']'
+++++ echo 1477598399
++++ ts=1477598399
++++ '[' 1477598399 ']'
++++ break
++++ echo 1477598399
+++ local last_time=1477598399
+++ '[' x = x1477594801 -o x = x1477598399 ']'
+++ '[' 1477594800 -gt 1477598399 ']'
+++ '[' 1477594800 -ge 1477594801 ']'
+++ '[' 1477598400 -eq 0 -o 1477598400 -ge 1477594801 ']'
+++ return 1
+++ case $? in
+++ echo /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ debug 'found log /tmp/.hb_report.workdir.ZWWqvU/report/journal.log'
+++ '[' 0 ']'
+++ '[' 0 -gt 0 ']'
+++ return 0
+++ read next_log
++ local logf_set=/tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++ '[' x = x/tmp/.hb_report.workdir.ZWWqvU/report/journal.log ']'
+++ echo /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ wc -l
++ local num_logs=1
+++ echo /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ awk '{print $NF}'
++ local oldest=/tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ echo /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ awk '{print $1}'
++ local newest=/tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ echo /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ awk '{for(i=NF-1; i>1; i--) print $i}'
++ local mid_logfiles=
++ case $num_logs in
++ print_logseg /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 1477594800 1477598400
++ test -x /usr/share/crmsh/hb_report/print_logseg
++ local logf=/tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++ local from_time=1477594800
++ local to_time=1477598400
++ local tmp sourcef
+++ find_decompressor /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ echo /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ grep -qs 'bz2$'
+++ echo /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ grep -qs 'gz$'
+++ echo /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ grep -qs 'xz$'
+++ file /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ grep -qs text
+++ echo cat
++ local cat=cat
++ '[' cat '!=' cat ']'
++ sourcef=/tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++ tmp=
++ '[' 1477594800 = 0 ']'
+++ findln_by_time /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 1477594800
+++ local logf=/tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ local tm=1477594800
+++ local first=1
++++ wc -l
+++ local last=3136
+++ local tmid mid trycnt
+++ '[' 1 -le 3136 ']'
+++ mid=1568
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 1568
+++++ tail -n +1568 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:29:59+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++ local 'l=2016-10-28T03:29:59+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)' ts
++++++ echo '2016-10-28T03:29:59+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:29:59+0800
+++++ perl -e '$time='\''2016-10-28T03:29:59+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477596599
++++ '[' -z 1477596599 ']'
++++ echo 1477596599
+++ tmid=1477596599
+++ '[' 1477596599 ']'
+++ break
+++ '[' -z 1477596599 ']'
+++ '[' 1477596599 -gt 1477594800 ']'
+++ last=1567
+++ '[' 1 -le 1567 ']'
+++ mid=784
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 784
+++++ tail -n +784 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:14:56+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++ local 'l=2016-10-28T03:14:56+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)' ts
++++++ echo '2016-10-28T03:14:56+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:14:56+0800
+++++ perl -e '$time='\''2016-10-28T03:14:56+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477595696
++++ '[' -z 1477595696 ']'
++++ echo 1477595696
+++ tmid=1477595696
+++ '[' 1477595696 ']'
+++ break
+++ '[' -z 1477595696 ']'
+++ '[' 1477595696 -gt 1477594800 ']'
+++ last=783
+++ '[' 1 -le 783 ']'
+++ mid=392
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 392
+++++ tail -n +392 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:07:20+0800 shiwen1 sbd[17372]: [17372]: info: Servant starting for device /dev/sda'
++++ local 'l=2016-10-28T03:07:20+0800 shiwen1 sbd[17372]: [17372]: info: Servant starting for device /dev/sda' ts
++++++ echo '2016-10-28T03:07:20+0800 shiwen1 sbd[17372]: [17372]: info: Servant starting for device /dev/sda'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:07:20+0800
+++++ perl -e '$time='\''2016-10-28T03:07:20+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477595240
++++ '[' -z 1477595240 ']'
++++ echo 1477595240
+++ tmid=1477595240
+++ '[' 1477595240 ']'
+++ break
+++ '[' -z 1477595240 ']'
+++ '[' 1477595240 -gt 1477594800 ']'
+++ last=391
+++ '[' 1 -le 391 ']'
+++ mid=196
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 196
+++++ tail -n +196 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:03:32+0800 shiwen1 sbd[2309]: [2309]: WARN: Servant for /dev/sda (pid: 17320) has terminated'
++++ local 'l=2016-10-28T03:03:32+0800 shiwen1 sbd[2309]: [2309]: WARN: Servant for /dev/sda (pid: 17320) has terminated' ts
++++++ echo '2016-10-28T03:03:32+0800 shiwen1 sbd[2309]: [2309]: WARN: Servant for /dev/sda (pid: 17320) has terminated'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:03:32+0800
+++++ perl -e '$time='\''2016-10-28T03:03:32+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477595012
++++ '[' -z 1477595012 ']'
++++ echo 1477595012
+++ tmid=1477595012
+++ '[' 1477595012 ']'
+++ break
+++ '[' -z 1477595012 ']'
+++ '[' 1477595012 -gt 1477594800 ']'
+++ last=195
+++ '[' 1 -le 195 ']'
+++ mid=98
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 98
+++++ tail -n +98 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:01:37+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++ local 'l=2016-10-28T03:01:37+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)' ts
++++++ echo '2016-10-28T03:01:37+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:01:37+0800
+++++ perl -e '$time='\''2016-10-28T03:01:37+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477594897
++++ '[' -z 1477594897 ']'
++++ echo 1477594897
+++ tmid=1477594897
+++ '[' 1477594897 ']'
+++ break
+++ '[' -z 1477594897 ']'
+++ '[' 1477594897 -gt 1477594800 ']'
+++ last=97
+++ '[' 1 -le 97 ']'
+++ mid=49
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 49
+++++ tail -n +49 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:00:44+0800 shiwen1 sbd[17292]: [17292]: WARN: Opening device /dev/sda failed.'
++++ local 'l=2016-10-28T03:00:44+0800 shiwen1 sbd[17292]: [17292]: WARN: Opening device /dev/sda failed.' ts
++++++ echo '2016-10-28T03:00:44+0800 shiwen1 sbd[17292]: [17292]: WARN: Opening device /dev/sda failed.'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:00:44+0800
+++++ perl -e '$time='\''2016-10-28T03:00:44+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477594844
++++ '[' -z 1477594844 ']'
++++ echo 1477594844
+++ tmid=1477594844
+++ '[' 1477594844 ']'
+++ break
+++ '[' -z 1477594844 ']'
+++ '[' 1477594844 -gt 1477594800 ']'
+++ last=48
+++ '[' 1 -le 48 ']'
+++ mid=24
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 24
+++++ tail -n +24 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:00:14+0800 shiwen1 sbd[17287]: [17287]: WARN: Opening device /dev/sda failed.'
++++ local 'l=2016-10-28T03:00:14+0800 shiwen1 sbd[17287]: [17287]: WARN: Opening device /dev/sda failed.' ts
++++++ echo '2016-10-28T03:00:14+0800 shiwen1 sbd[17287]: [17287]: WARN: Opening device /dev/sda failed.'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:00:14+0800
+++++ perl -e '$time='\''2016-10-28T03:00:14+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477594814
++++ '[' -z 1477594814 ']'
++++ echo 1477594814
+++ tmid=1477594814
+++ '[' 1477594814 ']'
+++ break
+++ '[' -z 1477594814 ']'
+++ '[' 1477594814 -gt 1477594800 ']'
+++ last=23
+++ '[' 1 -le 23 ']'
+++ mid=12
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 12
+++++ tail -n +12 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:00:01+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++ local 'l=2016-10-28T03:00:01+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)' ts
++++++ echo '2016-10-28T03:00:01+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:00:01+0800
+++++ perl -e '$time='\''2016-10-28T03:00:01+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477594801
++++ '[' -z 1477594801 ']'
++++ echo 1477594801
+++ tmid=1477594801
+++ '[' 1477594801 ']'
+++ break
+++ '[' -z 1477594801 ']'
+++ '[' 1477594801 -gt 1477594800 ']'
+++ last=11
+++ '[' 1 -le 11 ']'
+++ mid=6
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 6
+++++ tail -n +6 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:00:01+0800 shiwen1 sntp[17264]: 2016-10-28 03:00:01.404145 (+0800) -0.003017 +/- 0.364036 147.2.208.10 s2 no-leap'
++++ local 'l=2016-10-28T03:00:01+0800 shiwen1 sntp[17264]: 2016-10-28 03:00:01.404145 (+0800) -0.003017 +/- 0.364036 147.2.208.10 s2 no-leap' ts
++++++ echo '2016-10-28T03:00:01+0800 shiwen1 sntp[17264]: 2016-10-28 03:00:01.404145 (+0800) -0.003017 +/- 0.364036 147.2.208.10 s2 no-leap'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:00:01+0800
+++++ perl -e '$time='\''2016-10-28T03:00:01+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477594801
++++ '[' -z 1477594801 ']'
++++ echo 1477594801
+++ tmid=1477594801
+++ '[' 1477594801 ']'
+++ break
+++ '[' -z 1477594801 ']'
+++ '[' 1477594801 -gt 1477594800 ']'
+++ last=5
+++ '[' 1 -le 5 ']'
+++ mid=3
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 3
+++++ tail -n +3 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:00:01+0800 shiwen1 systemd[1]: Started Session 14092 of user root.'
++++ local 'l=2016-10-28T03:00:01+0800 shiwen1 systemd[1]: Started Session 14092 of user root.' ts
++++++ echo '2016-10-28T03:00:01+0800 shiwen1 systemd[1]: Started Session 14092 of user root.'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:00:01+0800
+++++ perl -e '$time='\''2016-10-28T03:00:01+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477594801
++++ '[' -z 1477594801 ']'
++++ echo 1477594801
+++ tmid=1477594801
+++ '[' 1477594801 ']'
+++ break
+++ '[' -z 1477594801 ']'
+++ '[' 1477594801 -gt 1477594800 ']'
+++ last=2
+++ '[' 1 -le 2 ']'
+++ mid=1
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 1
+++++ tail -n +1 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:00:01+0800 shiwen1 cron[17240]: pam_unix(crond:session): session opened for user root by (uid=0)'
++++ local 'l=2016-10-28T03:00:01+0800 shiwen1 cron[17240]: pam_unix(crond:session): session opened for user root by (uid=0)' ts
++++++ echo '2016-10-28T03:00:01+0800 shiwen1 cron[17240]: pam_unix(crond:session): session opened for user root by (uid=0)'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:00:01+0800
+++++ perl -e '$time='\''2016-10-28T03:00:01+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477594801
++++ '[' -z 1477594801 ']'
++++ echo 1477594801
+++ tmid=1477594801
+++ '[' 1477594801 ']'
+++ break
+++ '[' -z 1477594801 ']'
+++ '[' 1477594801 -gt 1477594800 ']'
+++ last=0
+++ '[' 1 -le 0 ']'
+++ echo 1
++ FROM_LINE=1
++ '[' -z 1 ']'
++ TO_LINE=
++ '[' 1477598400 '!=' 0 ']'
+++ findln_by_time /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 1477598400
+++ local logf=/tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++ local tm=1477598400
+++ local first=1
++++ wc -l
+++ local last=3136
+++ local tmid mid trycnt
+++ '[' 1 -le 3136 ']'
+++ mid=1568
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 1568
+++++ tail -n +1568 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:29:59+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++ local 'l=2016-10-28T03:29:59+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)' ts
++++++ echo '2016-10-28T03:29:59+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:29:59+0800
+++++ perl -e '$time='\''2016-10-28T03:29:59+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477596599
++++ '[' -z 1477596599 ']'
++++ echo 1477596599
+++ tmid=1477596599
+++ '[' 1477596599 ']'
+++ break
+++ '[' -z 1477596599 ']'
+++ '[' 1477596599 -gt 1477598400 ']'
+++ '[' 1477596599 -lt 1477598400 ']'
+++ first=1569
+++ '[' 1569 -le 3136 ']'
+++ mid=2352
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 2352
+++++ tail -n +2352 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:44:56+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++ local 'l=2016-10-28T03:44:56+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)' ts
++++++ echo '2016-10-28T03:44:56+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:44:56+0800
+++++ perl -e '$time='\''2016-10-28T03:44:56+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477597496
++++ '[' -z 1477597496 ']'
++++ echo 1477597496
+++ tmid=1477597496
+++ '[' 1477597496 ']'
+++ break
+++ '[' -z 1477597496 ']'
+++ '[' 1477597496 -gt 1477598400 ']'
+++ '[' 1477597496 -lt 1477598400 ']'
+++ first=2353
+++ '[' 2353 -le 3136 ']'
+++ mid=2744
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 2744
+++++ tail -n +2744 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:52:20+0800 shiwen1 sbd[18385]: [18385]: info: Servant starting for device /dev/sda'
++++ local 'l=2016-10-28T03:52:20+0800 shiwen1 sbd[18385]: [18385]: info: Servant starting for device /dev/sda' ts
++++++ echo '2016-10-28T03:52:20+0800 shiwen1 sbd[18385]: [18385]: info: Servant starting for device /dev/sda'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:52:20+0800
+++++ perl -e '$time='\''2016-10-28T03:52:20+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477597940
++++ '[' -z 1477597940 ']'
++++ echo 1477597940
+++ tmid=1477597940
+++ '[' 1477597940 ']'
+++ break
+++ '[' -z 1477597940 ']'
+++ '[' 1477597940 -gt 1477598400 ']'
+++ '[' 1477597940 -lt 1477598400 ']'
+++ first=2745
+++ '[' 2745 -le 3136 ']'
+++ mid=2940
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 2940
+++++ tail -n +2940 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:56:02+0800 shiwen1 sbd[2309]: [2309]: WARN: Servant for /dev/sda (pid: 18436) has terminated'
++++ local 'l=2016-10-28T03:56:02+0800 shiwen1 sbd[2309]: [2309]: WARN: Servant for /dev/sda (pid: 18436) has terminated' ts
++++++ echo '2016-10-28T03:56:02+0800 shiwen1 sbd[2309]: [2309]: WARN: Servant for /dev/sda (pid: 18436) has terminated'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:56:02+0800
+++++ perl -e '$time='\''2016-10-28T03:56:02+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477598162
++++ '[' -z 1477598162 ']'
++++ echo 1477598162
+++ tmid=1477598162
+++ '[' 1477598162 ']'
+++ break
+++ '[' -z 1477598162 ']'
+++ '[' 1477598162 -gt 1477598400 ']'
+++ '[' 1477598162 -lt 1477598400 ']'
+++ first=2941
+++ '[' 2941 -le 3136 ']'
+++ mid=3038
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 3038
+++++ tail -n +3038 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:58:03+0800 shiwen1 sbd[18456]: [18456]: info: Servant starting for device /dev/sda'
++++ local 'l=2016-10-28T03:58:03+0800 shiwen1 sbd[18456]: [18456]: info: Servant starting for device /dev/sda' ts
++++++ echo '2016-10-28T03:58:03+0800 shiwen1 sbd[18456]: [18456]: info: Servant starting for device /dev/sda'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:58:03+0800
+++++ perl -e '$time='\''2016-10-28T03:58:03+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477598283
++++ '[' -z 1477598283 ']'
++++ echo 1477598283
+++ tmid=1477598283
+++ '[' 1477598283 ']'
+++ break
+++ '[' -z 1477598283 ']'
+++ '[' 1477598283 -gt 1477598400 ']'
+++ '[' 1477598283 -lt 1477598400 ']'
+++ first=3039
+++ '[' 3039 -le 3136 ']'
+++ mid=3087
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 3087
+++++ tail -n +3087 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:59:02+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++ local 'l=2016-10-28T03:59:02+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)' ts
++++++ echo '2016-10-28T03:59:02+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:59:02+0800
+++++ perl -e '$time='\''2016-10-28T03:59:02+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477598342
++++ '[' -z 1477598342 ']'
++++ echo 1477598342
+++ tmid=1477598342
+++ '[' 1477598342 ']'
+++ break
+++ '[' -z 1477598342 ']'
+++ '[' 1477598342 -gt 1477598400 ']'
+++ '[' 1477598342 -lt 1477598400 ']'
+++ first=3088
+++ '[' 3088 -le 3136 ']'
+++ mid=3112
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 3112
+++++ tail -n +3112 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:59:32+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++ local 'l=2016-10-28T03:59:32+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)' ts
++++++ echo '2016-10-28T03:59:32+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:59:32+0800
+++++ perl -e '$time='\''2016-10-28T03:59:32+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477598372
++++ '[' -z 1477598372 ']'
++++ echo 1477598372
+++ tmid=1477598372
+++ '[' 1477598372 ']'
+++ break
+++ '[' -z 1477598372 ']'
+++ '[' 1477598372 -gt 1477598400 ']'
+++ '[' 1477598372 -lt 1477598400 ']'
+++ first=3113
+++ '[' 3113 -le 3136 ']'
+++ mid=3124
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 3124
+++++ tail -n +3124 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:59:45+0800 shiwen1 sbd[18473]: [18473]: WARN: Opening device /dev/sda failed.'
++++ local 'l=2016-10-28T03:59:45+0800 shiwen1 sbd[18473]: [18473]: WARN: Opening device /dev/sda failed.' ts
++++++ echo '2016-10-28T03:59:45+0800 shiwen1 sbd[18473]: [18473]: WARN: Opening device /dev/sda failed.'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:59:45+0800
+++++ perl -e '$time='\''2016-10-28T03:59:45+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477598385
++++ '[' -z 1477598385 ']'
++++ echo 1477598385
+++ tmid=1477598385
+++ '[' 1477598385 ']'
+++ break
+++ '[' -z 1477598385 ']'
+++ '[' 1477598385 -gt 1477598400 ']'
+++ '[' 1477598385 -lt 1477598400 ']'
+++ first=3125
+++ '[' 3125 -le 3136 ']'
+++ mid=3130
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 3130
+++++ tail -n +3130 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:59:51+0800 shiwen1 sbd[2309]: [2309]: WARN: Servant for /dev/sda (pid: 18474) has terminated'
++++ local 'l=2016-10-28T03:59:51+0800 shiwen1 sbd[2309]: [2309]: WARN: Servant for /dev/sda (pid: 18474) has terminated' ts
++++++ echo '2016-10-28T03:59:51+0800 shiwen1 sbd[2309]: [2309]: WARN: Servant for /dev/sda (pid: 18474) has terminated'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:59:51+0800
+++++ perl -e '$time='\''2016-10-28T03:59:51+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477598391
++++ '[' -z 1477598391 ']'
++++ echo 1477598391
+++ tmid=1477598391
+++ '[' 1477598391 ']'
+++ break
+++ '[' -z 1477598391 ']'
+++ '[' 1477598391 -gt 1477598400 ']'
+++ '[' 1477598391 -lt 1477598400 ']'
+++ first=3131
+++ '[' 3131 -le 3136 ']'
+++ mid=3133
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 3133
+++++ tail -n +3133 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:59:57+0800 shiwen1 sbd[18475]: [18475]: info: Servant starting for device /dev/sda'
++++ local 'l=2016-10-28T03:59:57+0800 shiwen1 sbd[18475]: [18475]: info: Servant starting for device /dev/sda' ts
++++++ echo '2016-10-28T03:59:57+0800 shiwen1 sbd[18475]: [18475]: info: Servant starting for device /dev/sda'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:59:57+0800
+++++ perl -e '$time='\''2016-10-28T03:59:57+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477598397
++++ '[' -z 1477598397 ']'
++++ echo 1477598397
+++ tmid=1477598397
+++ '[' 1477598397 ']'
+++ break
+++ '[' -z 1477598397 ']'
+++ '[' 1477598397 -gt 1477598400 ']'
+++ '[' 1477598397 -lt 1477598400 ']'
+++ first=3134
+++ '[' 3134 -le 3136 ']'
+++ mid=3135
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 3135
+++++ tail -n +3135 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:59:57+0800 shiwen1 sbd[2309]: [2309]: WARN: Servant for /dev/sda (pid: 18475) has terminated'
++++ local 'l=2016-10-28T03:59:57+0800 shiwen1 sbd[2309]: [2309]: WARN: Servant for /dev/sda (pid: 18475) has terminated' ts
++++++ echo '2016-10-28T03:59:57+0800 shiwen1 sbd[2309]: [2309]: WARN: Servant for /dev/sda (pid: 18475) has terminated'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:59:57+0800
+++++ perl -e '$time='\''2016-10-28T03:59:57+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477598397
++++ '[' -z 1477598397 ']'
++++ echo 1477598397
+++ tmid=1477598397
+++ '[' 1477598397 ']'
+++ break
+++ '[' -z 1477598397 ']'
+++ '[' 1477598397 -gt 1477598400 ']'
+++ '[' 1477598397 -lt 1477598400 ']'
+++ first=3136
+++ '[' 3136 -le 3136 ']'
+++ mid=3136
+++ trycnt=10
+++ '[' 10 -gt 0 ']'
++++ linetime /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 3136
+++++ tail -n +3136 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
+++++ head -1
++++ get_ts '2016-10-28T03:59:59+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++ local 'l=2016-10-28T03:59:59+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)' ts
++++++ echo '2016-10-28T03:59:59+0800 shiwen1 iscsid[2233]: iscsid: connect to 147.2.212.185:3260 failed (Connection refused)'
++++++ getstamp_rfc5424
++++++ awk '{print $1}'
+++++ str2time 2016-10-28T03:59:59+0800
+++++ perl -e '$time='\''2016-10-28T03:59:59+0800'\'';' -e '
+	$unix_tm = 0;
+	eval "use Date::Parse";
+	if (!$@) {
+		$unix_tm = str2time($time);
+	} else {
+		eval "use Date::Manip";
+		if (!$@) {
+			$unit_tm = UnixDate(ParseDateString($time), "%s");
+		}
+	}
+	if ($unix_tm != "") {
+		$unix_tm = int($unix_tm);
+	}
+	print $unix_tm;
+	'
++++ ts=1477598399
++++ '[' -z 1477598399 ']'
++++ echo 1477598399
+++ tmid=1477598399
+++ '[' 1477598399 ']'
+++ break
+++ '[' -z 1477598399 ']'
+++ '[' 1477598399 -gt 1477598400 ']'
+++ '[' 1477598399 -lt 1477598400 ']'
+++ first=3137
+++ '[' 3137 -le 3136 ']'
+++ echo 3136
++ TO_LINE=3136
++ '[' -z 3136 ']'
++ dumplog /tmp/.hb_report.workdir.ZWWqvU/report/journal.log 1 3136
++ local logf=/tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++ local from_line=1
++ local to_line=3136
++ '[' 1 ']'
++ tail -n +1 /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++ '[' 3136 ']'
++ head -3136
++ debug 'including segment [1-3136] from /tmp/.hb_report.workdir.ZWWqvU/report/journal.log'
++ '[' 0 ']'
++ '[' 0 -gt 0 ']'
++ return 0
++ loginfo /tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++ local logf=/tmp/.hb_report.workdir.ZWWqvU/report/journal.log
++ local fake=
+++ python -c 'f=open('\''/tmp/.hb_report.workdir.ZWWqvU/report/journal.log'\'');f.seek(0,2);print f.tell()+1'
++ local nextpos=327063
++ '[' '' ']'
++ echo '/tmp/.hb_report.workdir.ZWWqvU/report/journal.log 327063'
++ is_collector
++ test ''
++ '[' -z '' ']'
++ collect_for_nodes shiwen1
++ for node in '"$@"'
++ node_needs_pwd shiwen1
++ local n
++ return 1
++ SLAVEPIDS=' 2265'
++ start_slave_collector shiwen1
++ local node=shiwen1
++ is_collector
++ test ''
++ '[' -n ' 2265' ']'
++ wait 2265
++ dumpenv
++ cat
++ '[' shiwen1 = shiwen1 ']'
++ debug 'running:  hb_report __slave'
++ '[' 0 ']'
++ '[' 0 -gt 0 ']'
++ return 0
++ /usr/share/crmsh/hb_report/hb_report __slave
++ cd /tmp/.hb_report.workdir.ZWWqvU/report
++ tar xf -
++ analyze /tmp/.hb_report.workdir.ZWWqvU/report
++ local f flist
++ flist='hostcache members.txt cib.xml crm_mon.txt corosync.conf logd.cf sysinfo.txt'
++ for f in '$flist'
++ printf 'Diff hostcache... '
++ ls '/tmp/.hb_report.workdir.ZWWqvU/report/*/hostcache'
++ echo 'no /tmp/.hb_report.workdir.ZWWqvU/report/*/hostcache :/'
++ continue
++ for f in '$flist'
++ printf 'Diff members.txt... '
++ ls /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/members.txt
++ analyze_one /tmp/.hb_report.workdir.ZWWqvU/report members.txt
++ local rc node0 n
++ rc=0
++ node0=
++ for n in '$NODES'
++ '[' '' ']'
++ node0=shiwen1
++ return 0
++ echo OK
++ '[' members.txt '!=' cib.xml ']'
++ consolidate /tmp/.hb_report.workdir.ZWWqvU/report members.txt
++ for n in '$NODES'
++ '[' -f /tmp/.hb_report.workdir.ZWWqvU/report/members.txt ']'
++ mv /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/members.txt /tmp/.hb_report.workdir.ZWWqvU/report
++ ln -s ../members.txt /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1
++ for f in '$flist'
++ printf 'Diff cib.xml... '
++ ls /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/cib.xml
++ analyze_one /tmp/.hb_report.workdir.ZWWqvU/report cib.xml
++ local rc node0 n
++ rc=0
++ node0=
++ for n in '$NODES'
++ '[' '' ']'
++ node0=shiwen1
++ return 0
++ echo OK
++ '[' cib.xml '!=' cib.xml ']'
++ for f in '$flist'
++ printf 'Diff crm_mon.txt... '
++ ls /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/crm_mon.txt
++ analyze_one /tmp/.hb_report.workdir.ZWWqvU/report crm_mon.txt
++ local rc node0 n
++ rc=0
++ node0=
++ for n in '$NODES'
++ '[' '' ']'
++ node0=shiwen1
++ return 0
++ echo OK
++ '[' crm_mon.txt '!=' cib.xml ']'
++ consolidate /tmp/.hb_report.workdir.ZWWqvU/report crm_mon.txt
++ for n in '$NODES'
++ '[' -f /tmp/.hb_report.workdir.ZWWqvU/report/crm_mon.txt ']'
++ mv /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/crm_mon.txt /tmp/.hb_report.workdir.ZWWqvU/report
++ ln -s ../crm_mon.txt /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1
++ for f in '$flist'
++ printf 'Diff corosync.conf... '
++ ls /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/corosync.conf
++ analyze_one /tmp/.hb_report.workdir.ZWWqvU/report corosync.conf
++ local rc node0 n
++ rc=0
++ node0=
++ for n in '$NODES'
++ '[' '' ']'
++ node0=shiwen1
++ return 0
++ echo OK
++ '[' corosync.conf '!=' cib.xml ']'
++ consolidate /tmp/.hb_report.workdir.ZWWqvU/report corosync.conf
++ for n in '$NODES'
++ '[' -f /tmp/.hb_report.workdir.ZWWqvU/report/corosync.conf ']'
++ mv /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/corosync.conf /tmp/.hb_report.workdir.ZWWqvU/report
++ ln -s ../corosync.conf /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1
++ for f in '$flist'
++ printf 'Diff logd.cf... '
++ ls '/tmp/.hb_report.workdir.ZWWqvU/report/*/logd.cf'
++ echo 'no /tmp/.hb_report.workdir.ZWWqvU/report/*/logd.cf :/'
++ continue
++ for f in '$flist'
++ printf 'Diff sysinfo.txt... '
++ ls /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/sysinfo.txt
++ analyze_one /tmp/.hb_report.workdir.ZWWqvU/report sysinfo.txt
++ local rc node0 n
++ rc=0
++ node0=
++ for n in '$NODES'
++ '[' '' ']'
++ node0=shiwen1
++ return 0
++ echo OK
++ '[' sysinfo.txt '!=' cib.xml ']'
++ consolidate /tmp/.hb_report.workdir.ZWWqvU/report sysinfo.txt
++ for n in '$NODES'
++ '[' -f /tmp/.hb_report.workdir.ZWWqvU/report/sysinfo.txt ']'
++ mv /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/sysinfo.txt /tmp/.hb_report.workdir.ZWWqvU/report
++ ln -s ../sysinfo.txt /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1
++ checkcrmvfy /tmp/.hb_report.workdir.ZWWqvU/report
++ for n in '$NODES'
++ '[' -s /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/crm_verify.txt ']'
++ checkbacktraces /tmp/.hb_report.workdir.ZWWqvU/report
++ for n in '$NODES'
++ '[' -s /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/backtraces.txt ']'
++ checkpermissions /tmp/.hb_report.workdir.ZWWqvU/report
++ for n in '$NODES'
++ '[' -s /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/permissions.txt ']'
++ echo 'WARN: problem with permissions/ownership at shiwen1:'
++ cat /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/permissions.txt
++ checklogs /tmp/.hb_report.workdir.ZWWqvU/report
++ local logs pattfile l n
+++ find /tmp/.hb_report.workdir.ZWWqvU/report -name ha-log.txt
+++ for l in '$EXTRA_LOGS'
++++ basename /var/log/messages
+++ find /tmp/.hb_report.workdir.ZWWqvU/report/analysis.txt /tmp/.hb_report.workdir.ZWWqvU/report/corosync.conf /tmp/.hb_report.workdir.ZWWqvU/report/crm_mon.txt /tmp/.hb_report.workdir.ZWWqvU/report/ha-log.txt /tmp/.hb_report.workdir.ZWWqvU/report/ha-log.txt.info /tmp/.hb_report.workdir.ZWWqvU/report/journal.log /tmp/.hb_report.workdir.ZWWqvU/report/members.txt /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1 /tmp/.hb_report.workdir.ZWWqvU/report/sysinfo.txt -name messages
+++ for l in '$EXTRA_LOGS'
++++ basename /var/log/pacemaker.log
+++ find /tmp/.hb_report.workdir.ZWWqvU/report/analysis.txt /tmp/.hb_report.workdir.ZWWqvU/report/corosync.conf /tmp/.hb_report.workdir.ZWWqvU/report/crm_mon.txt /tmp/.hb_report.workdir.ZWWqvU/report/ha-log.txt /tmp/.hb_report.workdir.ZWWqvU/report/ha-log.txt.info /tmp/.hb_report.workdir.ZWWqvU/report/journal.log /tmp/.hb_report.workdir.ZWWqvU/report/members.txt /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1 /tmp/.hb_report.workdir.ZWWqvU/report/sysinfo.txt -name pacemaker.log
++ logs='/tmp/.hb_report.workdir.ZWWqvU/report/ha-log.txt
+/tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/ha-log.txt
+/tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/messages
+/tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/pacemaker.log'
++ '[' '/tmp/.hb_report.workdir.ZWWqvU/report/ha-log.txt
+/tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/ha-log.txt
+/tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/messages
+/tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/pacemaker.log' ']'
+++ mktemp
++ pattfile=/tmp/tmp.yuQQLuDOlK
++ add_tmpfiles /tmp/tmp.yuQQLuDOlK
++ test -f /tmp/tmp.ixqgNYepUb
++ echo /tmp/tmp.yuQQLuDOlK
++ for p in '$LOG_PATTERNS'
++ echo CRIT:
++ for p in '$LOG_PATTERNS'
++ echo ERROR:
++ echo ''
++ echo 'Log patterns:'
++ for n in '$NODES'
++ cat /tmp/.hb_report.workdir.ZWWqvU/report/ha-log.txt /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/ha-log.txt /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/messages /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1/pacemaker.log
++ grep -f /tmp/tmp.yuQQLuDOlK
++ events /tmp/.hb_report.workdir.ZWWqvU/report
++ local destdir n
++ destdir=/tmp/.hb_report.workdir.ZWWqvU/report
++ '[' -f /tmp/.hb_report.workdir.ZWWqvU/report/ha-log.txt ']'
++ events_all /tmp/.hb_report.workdir.ZWWqvU/report/ha-log.txt
++ local Epatt title p
+++ echo '
+membership crmd.*(NEW|LOST)|pcmk.*(lost|memb|LOST|MEMB):
+quorum crmd.*Updating.quorum.status|crmd.*quorum.(lost|ac?quir)
+pause Process.pause.detected
+resources lrmd.*(start|stop)
+stonith crmd.*Exec|stonith-ng.*log_oper.*reboot|stonithd.*(requests|(Succeeded|Failed).to.STONITH|result=)
+start_stop Configuration.validated..Starting.heartbeat|Corosync.Cluster.Engine|Executive.Service.RELEASE|Requesting.shutdown|Shutdown.complete
+'
+++ read title p
+++ '[' -n '' ']'
+++ read title p
+++ sed s/.//
+++ '[' -n 'crmd.*(NEW|LOST)|pcmk.*(lost|memb|LOST|MEMB):' ']'
+++ echo -n '|crmd.*(NEW|LOST)|pcmk.*(lost|memb|LOST|MEMB):'
+++ read title p
+++ '[' -n 'crmd.*Updating.quorum.status|crmd.*quorum.(lost|ac?quir)' ']'
+++ echo -n '|crmd.*Updating.quorum.status|crmd.*quorum.(lost|ac?quir)'
+++ read title p
+++ '[' -n Process.pause.detected ']'
+++ echo -n '|Process.pause.detected'
+++ read title p
+++ '[' -n 'lrmd.*(start|stop)' ']'
+++ echo -n '|lrmd.*(start|stop)'
+++ read title p
+++ '[' -n 'crmd.*Exec|stonith-ng.*log_oper.*reboot|stonithd.*(requests|(Succeeded|Failed).to.STONITH|result=)' ']'
+++ echo -n '|crmd.*Exec|stonith-ng.*log_oper.*reboot|stonithd.*(requests|(Succeeded|Failed).to.STONITH|result=)'
+++ read title p
+++ '[' -n 'Configuration.validated..Starting.heartbeat|Corosync.Cluster.Engine|Executive.Service.RELEASE|Requesting.shutdown|Shutdown.complete' ']'
+++ echo -n '|Configuration.validated..Starting.heartbeat|Corosync.Cluster.Engine|Executive.Service.RELEASE|Requesting.shutdown|Shutdown.complete'
+++ read title p
+++ '[' -n '' ']'
+++ read title p
++ Epatt='crmd.*(NEW|LOST)|pcmk.*(lost|memb|LOST|MEMB):|crmd.*Updating.quorum.status|crmd.*quorum.(lost|ac?quir)|Process.pause.detected|lrmd.*(start|stop)|crmd.*Exec|stonith-ng.*log_oper.*reboot|stonithd.*(requests|(Succeeded|Failed).to.STONITH|result=)|Configuration.validated..Starting.heartbeat|Corosync.Cluster.Engine|Executive.Service.RELEASE|Requesting.shutdown|Shutdown.complete'
++ grep -E 'crmd.*(NEW|LOST)|pcmk.*(lost|memb|LOST|MEMB):|crmd.*Updating.quorum.status|crmd.*quorum.(lost|ac?quir)|Process.pause.detected|lrmd.*(start|stop)|crmd.*Exec|stonith-ng.*log_oper.*reboot|stonithd.*(requests|(Succeeded|Failed).to.STONITH|result=)|Configuration.validated..Starting.heartbeat|Corosync.Cluster.Engine|Executive.Service.RELEASE|Requesting.shutdown|Shutdown.complete' /tmp/.hb_report.workdir.ZWWqvU/report/ha-log.txt
++ for n in '$NODES'
++ '[' -d /tmp/.hb_report.workdir.ZWWqvU/report/shiwen1 ']'
++ awk '$4=="shiwen1"' /tmp/.hb_report.workdir.ZWWqvU/report/events.txt
++ check_if_log_is_empty /tmp/.hb_report.workdir.ZWWqvU/report
++ find /tmp/.hb_report.workdir.ZWWqvU/report -iname ha-log.txt
++ grep -q .
++ mktemplate
++ cat
+++ date
++ '[' -f /tmp/.hb_report.workdir.ZWWqvU/report/sysinfo.txt ']'
++ echo 'Common system info found:'
++ cat /tmp/.hb_report.workdir.ZWWqvU/report/sysinfo.txt
++ '[' 1 ']'
++ wait
++ '[' 1 = 1 ']'
++ pickcompress
+++ pickfirst bzip2 gzip xz
+++ for x in '"$@"'
+++ which bzip2
+++ echo bzip2
+++ return 0
++ COMPRESS_PROG=bzip2
++ '[' bzip2 = xz ']'
++ '[' bzip2 = bzip2 ']'
++ COMPRESS_EXT=.bz2
++ bzip2
++ cd /tmp/.hb_report.workdir.ZWWqvU/report/..
++ tar cf - report
++ finalword
++ '[' 1 = 1 ']'
++ echo 'The report is saved in ./report.tar.bz2'
+++ time2str 1477594800
+++ perl -e 'use POSIX; print strftime('\''%x %X'\'',localtime(1477594800));'
+++ time2str 1477598400
+++ perl -e 'use POSIX; print strftime('\''%x %X'\'',localtime(1477598400));'
++ echo 'Report timespan: 10/28/16 03:00:00 - 10/28/16 04:00:00'
++ echo ' '
++ echo 'Thank you for taking time to create this report.'
+++ cat /tmp/tmp.ixqgNYepUb
++ rm -rf /tmp/.hb_report.workdir.ZWWqvU /tmp/tmp.yuQQLuDOlK
++ rm /tmp/tmp.ixqgNYepUb
