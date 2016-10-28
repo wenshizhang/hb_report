@@ -8,23 +8,23 @@
 import os
 
 class collector:
-	ENVIRONMENT = ''
+	ENVIRONMENT = envir
 
-	def mktemp():
+	def mktemp(self):
 		pass
 
-	def collect_info():
+	def collect_info(self):
 		pass
 
-	def return_result():
+	def return_result(self):
 		pass
 
-	def get_envir():
+	def get_envir(self):
 		pass
 
 	def __init__(self,envir):
 		self.ENVIRONMENT = envir
 
-	def run():
+	def run(self):
 		pass
 

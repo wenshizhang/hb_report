@@ -6,30 +6,36 @@
 # Description:
 #########################################################################
 import os
+import datetime
 
 
 class envir:
 	FROM_TIME = ''
 	TO_TIME = ''
 	NODE_SOURCE = ''
-	USER_NODES = ''
+	USER_NODES = []
+	UNIQUE_MSG = ""
 	SSH_USER = ''
 	SSH_OPTS = ''
 	DEST = ''
+	DESTDIR = '.'
+	NOW = ''
 	HA_LOG = ''
 	EDITOR = ''
-	SANITIZE = ''
+	SANITIZE = 'passw.*'
 	DO_SANITIZE = ''
-	SKIP_LVL = ''
+	SKIP_LVL = 0
 	LOG_PATTERNS = ''
 	NO_SSH = ''
-	NO_DESCRIPTION = ''
+	NO_DESCRIPTION = '1'
 	FORCE_TO_REMOVE = ''
-	EXTRA_LOGS = ''
+	EXTRA_LOGS = ['/var/log/messages','/var/log/pacemaker.log']
+	PCMK_LOG = "/var/log/pacemaker.log"
 	USER_CLUSTER_TYPE = ''
-	VERBOSITY = ''
-	COMPRESS = ''
+	VERBOSITY = 0
+	COMPRESS = '1'
 	SSH_PASSWD_NODES = ''
+	TRY_SSH = ['root','hacluster']
 
 	ANALYSIS_F='analysis.txt'
 	DESCRIPTION_F='description.txt'
@@ -49,6 +55,17 @@ class envir:
 	CIB_F='cib.xml'
 	CIB_TXT_F='cib.txt'
 	COROSYNC_RECORDER_F='fdata.txt'
-	CONFIGURATIONS="/etc/drbd.conf /etc/drbd.d /etc/booth/booth.conf"
+	CONFIGURATIONS=['/etc/drbd.conf','/etc/drbd.d','/etc/booth/booth.conf']
 
+	def __init__(self):
+		'''
+		do some environment variable initial 
+		'''
+		now = datetime.datetime.now()
+		now_string = now.strftime("%Y-%m-%d %H:%M:%S.%f")
 
+		self.UNIQUE_MSG="Mark:HB_REPORT:"+now_string
+		self.NOW = now
+
+		date = datetime.datetime.date(now).strftime("%a-%d-%m-%Y")
+		self.DEST = "hb_report-"+date

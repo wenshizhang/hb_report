@@ -8,26 +8,26 @@
 import os
 
 class node:
-	SSH_PASSWD
-	WE
-	WORKDIR
-	THIS_IS_NODE
+	SSH_PASSWD = ''
+	WE = ''
+	WORKDIR = ''
+	THIS_IS_NODE = ''
 
-	def compabitility_pcmk():
+	def compabitility_pcmk(self):
 		pass
 
-	def get_cluster_type():
+	def get_cluster_type(self):
 		pass
 	
-	def conf():
+	def conf(self):
 		pass
 
-	def check_this_is_node():
+	def check_this_is_node(self):
 		pass
 
-	def getlog():
+	def getlog(self):
 		pass
 
-	def mktar():
+	def mktar(self):
 		pass
 
