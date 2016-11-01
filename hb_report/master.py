@@ -10,7 +10,7 @@ import	datetime
 import	sys
 import	getopt
 import	envir
-
+import	socket
 from crmsh	import logtime
 from crmsh	import utils
 from crmsh	import logparser
@@ -26,8 +26,7 @@ class master(node):
 		sys.exit
 
 	def usage(self,msg = ''):
-		print '''
-usage: report -f {time|"cts:"testnum} [-t time]
+		print '''usage: report -f {time|"cts:"testnum} [-t time]
        [-u user] [-X ssh-options] [-l file] [-n nodes] [-E files]
        [-p patt] [-L patt] [-e prog] [-MSDZAQVsvhd] [dest]
 
@@ -102,39 +101,65 @@ usage: report -f {time|"cts:"testnum} [-t time]
 
 
 	def analyzed_argvment(self,argv):
-		opt,arg = getopt.getopt(sys.argv[1:],"dMQASZVvhDCu:f:t:n:l:E:e:X:")
-		if(len(arg)>1):
+		try:
+			opt,arg = getopt.getopt(sys.argv[1:],"hsQSDCZMAvdf:t:n:u:X:l:e:p:L:E:")
+			if(len(arg)>1):
+				self.usage("short")
+				sys.exit()
+
+			if(len(arg) == 1):
+				envir.DEST = arg
+			for args,option in opt:
+				if (args == '-f'):
+					envir.FROM_TIME = self.change_to_timestamp(option)
+				if (args == '-t'):
+					envir.TO_TIME  = self.change_to_timestamp(option)
+				if (args == '-n'):
+					envir.NODE_SOURCE = 'user'
+					for i in option.split(' '):
+						envir.USER_NODES.append(i)
+				if (args == '-h'):
+					self.usage()
+				if (args == '-u'):
+					envir.SSH_USER.append(option)
+				if (args == '-X'):
+					envir.SSH_OPTS = envir.SSH_OPTS+option
+				if (args == '-l'):
+					envir.HA_LOG = option
+				if(args == '-e'):
+					envir.EDITOR = option
+				if(args == '-p'):
+					envir.SANITIZE.append(option)
+				if(args == '-s'):
+					envir.DO_SANITIZE = 1
+				if(args == '-Q'):
+					envir.SKIP_LVL = envir.SKIP_LVL + 1
+				if(args == '-L'):
+					envir.LOG_PATTERNS.append(option)
+				if(args == '-S'):
+					envir.NO_SSH = 1
+				if(args == '-D'):
+					envir.NO_DESCRIPTION = 1
+				if(args == '-C'):
+					pass
+				if(args == '-Z'):
+					envir.FORCE_REMOVE_DEST = 1
+				if(args == '-M'):
+					envir.EXTRA_LOGS = []
+				if(args == '-E'):
+					envir.EXTRA_LOGS.append(option)
+				if(args == '-A'):
+					envir.USER_CLUSTER_TYPE = 'openais'
+				if(args == '-v'):
+					envir.VERBOSITY = envir.VERBOSITY+1
+				if(args == '-d'):
+					envir.COMPRSS = 0
+		except getopt.GetoptError:
 			self.usage("short")
-			sys.exit()
-
-		if(len(arg) == 1):
-			envir.DEST = arg
-		for args,option in opt:
-			if (args == '-f'):
-				envir.FROM_TIME = self.change_to_timestamp(option)
-			if (args == '-t'):
-				envir.TO_TIME  = self.change_to_timestamp(option)
-			if (args == '-n'):
-				envir.NODE_SOURCE = 'user'
-				for i in option.split(' '):
-					envir.USER_NODES.append(i)
-				print envir.NODE_SOURCE, envir.USER_NODES
-			if (args == '-h'):
-				self.usage()
-			if (args == '-u'):
-				envir.SSH_USER.append(option)
-			if (args == '-X'):
-				envir.SSH_OPTS = envir.SSH_OPTS+option
-			if (args == '-l'):
-				envir.HA_LOG = option
-			if(a)
-
 			envir.SSH_USER.append("root")
 			envir.SSH_USER.append("hacluster")
 
 
-	def mktemp(self,s):
-		pass
 
 	def is_node(self):
 		pass
@@ -177,10 +202,16 @@ def run():
 	'''
 	This method do most of the job that master node should do
 	'''
+	envir.setvarsanddefaults()
 	mtr = master()
 	mtr.analyzed_argvment(sys.argv)
+	
+	#who am i
+	mtr.WE= socket.gethostname()
+	
+	#get WORKDIR
+	mtr.WORKDIR = mtr.mktemp()
+	mtr.compabitility_pcmk()
 
-
-#run('-f 3:00 -t 4:00 -n "shiwen1 shiwen2" report')
 run()
 

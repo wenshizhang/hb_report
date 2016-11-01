@@ -6,6 +6,8 @@
 # Description:
 #########################################################################
 import os
+import tempfile
+import envir
 
 class node:
 	SSH_PASSWD = ''
@@ -13,8 +15,13 @@ class node:
 	WORKDIR = ''
 	THIS_IS_NODE = ''
 
+	def mktemp(self):
+		tmpdir = tempfile.mkdtemp()
+		return tmpdir
+
 	def compabitility_pcmk(self):
-		pass
+		os.system(". /usr/lib/ocf/lib/heartbeat/ocf-shellfuncs")
+		from heatbeat import ocf-directories
 
 	def get_cluster_type(self):
 		pass

@@ -5,13 +5,15 @@
 # Created Time: Thu 27 Oct 2016 01:23:13 PM CST
 # Description:
 #########################################################################
-import os
+import	os
+import	envir
+import	sys
+import	socket
 
-class collector:
-	ENVIRONMENT = envir
+from	node import	node
 
-	def mktemp(self):
-		pass
+class collector(node):
+
 
 	def collect_info(self):
 		pass
@@ -21,10 +23,22 @@ class collector:
 
 	def get_envir(self):
 		pass
-
-	def __init__(self,envir):
-		self.ENVIRONMENT = envir
-
-	def run(self):
+	
+	def __init__(self):
 		pass
+
+
+def run():
+	sla = collector()
+	
+	#who am i
+	sla.WE = socket.gethostname()
+
+	#get WORKDIR
+	sla.WORKDIR = sla.mktemp()
+	sla.WORKDIR = sla.WORKDIR+"/"+sla.WE
+	print sla.WORKDIR
+
+
+run()
 
