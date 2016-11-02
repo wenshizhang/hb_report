@@ -9,6 +9,7 @@ import os
 import datetime
 import sys
 import socket
+import re
 
 from crmsh	import utils
 
@@ -44,6 +45,7 @@ COMPRESS = 1
 SSH_PASSWD_NODES = ''
 TRY_SSH = ['root','hacluster']
 
+#the goods
 ANALYSIS_F='analysis.txt'
 DESCRIPTION_F='description.txt'
 HALOG_F='ha-log.txt'
@@ -63,6 +65,12 @@ CIB_F='cib.xml'
 CIB_TXT_F='cib.txt'
 COROSYNC_RECORDER_F='fdata.txt'
 CONFIGURATIONS=['/etc/drbd.conf','/etc/drbd.d','/etc/booth/booth.conf']
+
+
+#from ocf-directories
+HA_BIN = ''
+HA_CF = ''
+
 
 #set variables default
 def setvarsanddefaults():
@@ -95,3 +103,28 @@ def warn(msg):
 
 def info(msg):
 	print >> sys.stderr,socket.gethostname(),"INFO:",msg
+
+def get_value(line,key):
+	'''
+	Base on parameter key to search and get the value in string line
+	'''
+	value = line.split("=")
+	value = str(value[1:])
+	value = value[2:len(value)-5]
+	return value
+
+def dirname(path):
+	index = path.rfind("/")
+
+def get_ocf_directories():
+	'''
+	Get some critical variable that store at osc-directories 
+	'''
+	f = open("/usr/lib/ocf/lib/heartbeat/ocf-directories","r");
+	line = f.readline()
+	while len(line) >0:
+		if line.find("HA_DIR:=") != -1:
+			HA_DIR = get_value(line,"HA_DIR")
+		if line.find("HA_BIN:=") != -1:
+			HA_BIN = get_value(line,"HA_BIN")
+		line = f.readline()

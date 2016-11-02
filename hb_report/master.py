@@ -1,16 +1,13 @@
-#!/usr/bin/python3.5
-# _*_ coding: utf-8 _*_
-# File Name: get_second.py
-# mail: wenshizhang555@hoxmail.com
-# Created Time: Wed 26 Oct 2016 11:28:22 AM CST
-# Description:
-#########################################################################
+# Copyright (C) 2016 Shiwen Zhang <szhang@suse.de>
+# See COPYING for license information.
+
 import	os
 import	datetime
 import	sys
 import	getopt
 import	envir
 import	socket
+import	utillib
 from crmsh	import logtime
 from crmsh	import utils
 from crmsh	import logparser
@@ -202,10 +199,12 @@ def run():
 	'''
 	This method do most of the job that master node should do
 	'''
-	envir.setvarsanddefaults()
+	utillib.setvarsanddefaults()
+	utillib.get_ocf_directories()
+	print "This message from master script:HA_BIN is",envir.HA_BIN
 	mtr = master()
 	mtr.analyzed_argvment(sys.argv)
-	
+	print envir.TO_TIME
 	#who am i
 	mtr.WE= socket.gethostname()
 	

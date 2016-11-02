@@ -5,9 +5,10 @@
 # Created Time: Thu 27 Oct 2016 11:11:28 AM CST
 # Description:
 #########################################################################
-import os
-import tempfile
-import envir
+import	os
+import	tempfile
+import	envir
+import	utillib
 
 class node:
 	SSH_PASSWD = ''
@@ -19,9 +20,22 @@ class node:
 		tmpdir = tempfile.mkdtemp()
 		return tmpdir
 
+	def get_crm_daemon_dir(self):
+		'''
+		Get envir.CRM_DARMON_DIR
+		'''
+		libdir = utillib.dirname(envir.HA_BIN)
+
+	def get_crm_daemon_dir2(self):
+		'''
+		Get_crm_daemon_dir function failed
+		'''
+
 	def compabitility_pcmk(self):
-		os.system(". /usr/lib/ocf/lib/heartbeat/ocf-shellfuncs")
-		from heatbeat import ocf-directories
+		self.get_crm_daemon_dir() or self.get_crm_daemon_dir2()
+
+	def high_debug_level1(self):
+		pass
 
 	def get_cluster_type(self):
 		pass
@@ -37,4 +51,5 @@ class node:
 
 	def mktar(self):
 		pass
+
 

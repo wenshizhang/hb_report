@@ -1,19 +1,19 @@
 #!/usr/bin/python3.5
-# _*_ coding: utf-8 _*_
-# File Name: collector.py
-# mail: wenshizhang555@hoxmail.com
-# Created Time: Thu 27 Oct 2016 01:23:13 PM CST
-# Description:
-#########################################################################
+
 import	os
 import	envir
 import	sys
 import	socket
+import	utillib
 
 from	node import	node
 
 class collector(node):
 
+
+	def debug_info(self):
+		if(envir.VERBOSITY > 1):
+			utillib.info("high debug level, please read debug.out")
 
 	def collect_info(self):
 		pass
