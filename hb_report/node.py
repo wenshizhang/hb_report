@@ -10,6 +10,8 @@ import	tempfile
 import	envir
 import	utillib
 
+from crmsh import config
+
 class node:
 	SSH_PASSWD = ''
 	WE = ''
@@ -25,14 +27,75 @@ class node:
 		Get envir.CRM_DARMON_DIR
 		'''
 		libdir = utillib.dirname(envir.HA_BIN)
+		for p in ['/pacemaker','/heartbeat']:
+			if os.access(libdir+p+'/crmd',os.X_OK):
+				utillib.debug("setting CRM_DAEMON_DIR to"+libdir+p)
+				envir.CRM_DAEMON_DIR = libdir+p
+				return 0
+
+		return 1
 
 	def get_crm_daemon_dir2(self):
 		'''
 		Get_crm_daemon_dir function failed
 		'''
+		for p in ['/usr','/usr/local','/opt']:
+			for d in ['libexec','lib64','lib']:
+				for d2 in ['pacemaker','heartbeat']:
+					if os.access(p+'/'+d+'/'+d2+'/crmd',os.X_OK):
+						utillib.debug("setting CRM_DAEMON_CRM to"+p+'/'+d+'/'+d2+'/crmd')
+						envir.CRM_DAEMON_DIR = p+'/'+d+'/'+d2+'/crmd'
+						break
 
-	def compabitility_pcmk(self):
-		self.get_crm_daemon_dir() or self.get_crm_daemon_dir2()
+	def get_pe_state_dir(self):
+		'''
+		Get PE_STATE_DIR from crmsh/config/path.pe_state_dir
+		'''
+		envir.PE_STATE_DIR = config.path.pe_state_dir
+		print envir.PE_STATE_DIR
+	
+	def get_pe_state_dir2(self):
+		'''
+		Failed to get PE_STATE_DIR from crmsh
+		'''
+		localstatedir = utillib.dirname(envir.HA_VARLIB)
+		found = utillib.find_dir("pengine","/var/lib")
+		files = os.listdir(found)
+		for i in files:
+			if i.find(".last") != -1:
+				lastf = os.path.join(found,i)
+
+		if os.path.isfile(lastf):
+			envir.PE_STATE_DIR = utillib.dirname(lastf)
+
+		else:
+			for p in ['pacemaker/pengine','pengine','heartbeat/pengine']:
+				if os.path.isdir(localstatedir+'/'+p):
+					utillib.debug("setting PE_STATE_DIR to "+localstatedir+'/'+p)
+					envir.PE_STATE_DIR = localstatedir+'/'+p
+					break
+
+	def get_cib_dir(self):
+		'''
+		Get CIB_DIR from crmsh
+		'''	
+	
+	def get_cib_dir2(self):
+		pass
+		
+
+	def compabitility_pcmk(self):				
+		if self.get_crm_daemon_dir():				#have not tested carefully
+			self.get_crm_daemon_dir2()
+
+		if not len(envir.CRM_DAEMON_DIR):
+			utillib.fatal("cannot find pacemaker daemon directory!")
+
+		if self.get_pe_state_dir():
+			self.get_pe_state_dir2()
+
+		if self.get_cib_dir():
+			self.get_cib_dir2()
 
 	def high_debug_level1(self):
 		pass

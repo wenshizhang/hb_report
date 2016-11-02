@@ -49,7 +49,23 @@ def get_value(line,key):
 	return value
 
 def dirname(path):
+	if path.endswith("/"):
+		path = path[1:len(path)-1]
+
 	index = path.rfind("/")
+	dirname = path[0:index]
+	
+	return dirname
+
+def basename(path):
+	if path.endswith("/"):
+		path = path[1:len(path)-1]
+	
+	index = path.rfind("/")
+	basename = path[index+1:]
+	
+	return basename
+
 
 def get_ocf_directories():
 	'''
@@ -60,6 +76,26 @@ def get_ocf_directories():
 	while len(line) >0:
 		if line.find("HA_DIR:=") != -1:
 			envir.HA_DIR = get_value(line,"HA_DIR")
+		
+		if line.find("HA_CF:=") != -1:
+			envir.HA_CF = get_value(line,"HA_CF")
+		
+		if line.find("HA_VARLIB:=") != -1:
+			envir.HA_VARLIB = get_value(line,"HA_VARLIB")
+
 		if line.find("HA_BIN:=") != -1:
 			envir.HA_BIN = get_value(line,"HA_BIN")
 		line = f.readline()
+
+
+def find_dir(name,path):
+	result = []
+	for root,dirs,files in os.walk(path):
+#		print "dirs is ",dirs
+#		print "files is",files
+#		print "root is",root
+		if name in dirs:
+				result.append(os.path.join(root,name))
+	
+	result_string = ''.join(result)
+	return result_string

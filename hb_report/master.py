@@ -201,10 +201,10 @@ def run():
 	'''
 	utillib.setvarsanddefaults()
 	utillib.get_ocf_directories()
-	print "This message from master script:HA_BIN is",envir.HA_BIN
+
 	mtr = master()
 	mtr.analyzed_argvment(sys.argv)
-	print envir.TO_TIME
+	
 	#who am i
 	mtr.WE= socket.gethostname()
 	
