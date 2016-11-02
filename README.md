@@ -22,6 +22,7 @@ Log file location. If, for whatever reason, hb_report cannot find the log files,
 Extra log files to collect. This option is cumulative. By default, /var/log/messages are collected along with the cluster logs.
 
 * -M
+
 Don't collect extra log files, but only the file containing messages from the cluster subsystems.
 
 * -L patt
@@ -44,7 +45,9 @@ Extra ssh options. These will be added to every ssh invocation. Alternatively, u
 Single node operation. Run hb_report only on this node and don't try to start slave collectors on other members of the cluster. Under normal circumstances this option is not needed. Use if ssh(1) does not work to other nodes.
 
 * -Z
+
 If the destination directory exist, remove it instead of exiting (this is default for CTS).
+
 * -V
 Print the version including the last repository changeset.
 
