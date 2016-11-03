@@ -108,5 +108,23 @@ def which(command):
 	
 	for p in path_list:
 		if command in os.listdir(p):
-			print "path is ",p,"command is",command
 			return os.path.join(p,command)
+
+
+def ps_grep(proname):
+	'''
+	Do some ps and grep thing, like command ps|grep
+	Proname is a list,mean grep message
+	'''
+
+	dirs = os.listdir("/proc")
+	for d in dirs:
+		if re.match("\d+,d"):
+			path = os.path.join("/proc",d+'/cmdline')
+			f = open(path,'r')
+			msg = f.readline()
+			if msg.find(proname) != -1:
+				print msg
+				return 1
+
+	return 0

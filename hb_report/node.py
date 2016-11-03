@@ -6,10 +6,12 @@
 # Description:
 #########################################################################
 import	os
+import	sys
 import	tempfile
 import	envir
 import	utillib
 
+from StringIO import StringIO
 from crmsh import config
 
 class node:
@@ -125,8 +127,12 @@ class node:
 		pass
 
 	def get_cluster_type(self):
-		pass
-	
+		'''
+		If user do not input cluster type then figure out cluster itself
+		'''
+
+		if utillib.ps_grep(name):
+
 	def conf(self):
 		pass
 
@@ -144,7 +150,9 @@ class node:
 		'''
 		Figure out cluster type
 		'''
-		if len(envir.USER_CLUSTER_TYPE):
-			CLUSTER_TYPE
+		if not len(envir.USER_CLUSTER_TYPE):
+			CLUSTER_TYPE = self.get_cluster_type()
+		else:
+			CLUSTER_TYPE = envir.USER_CLUSTER_TYPE
 
 
