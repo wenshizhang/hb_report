@@ -52,7 +52,7 @@ class node:
 		Get PE_STATE_DIR from crmsh/config/path.pe_state_dir
 		'''
 		envir.PE_STATE_DIR = config.path.pe_state_dir
-		print envir.PE_STATE_DIR
+		return len(envir.PE_STATE_DIR)
 	
 	def get_pe_state_dir2(self):
 		'''
@@ -77,12 +77,31 @@ class node:
 
 	def get_cib_dir(self):
 		'''
-		Get CIB_DIR from crmsh
+		Get CIB_DIR from crmsh/config.path.crm_config
 		'''	
+		envir.CIB_DIR = config.path.crm_config
+		return len(envir.CIB_DIR)
 	
 	def get_cib_dir2(self):
-		pass
+		'''
+		Failed to get CIB_DIR from crmsh
+		HA_VARKIB is nornally set to {localstatedir}/heartbeat
+		'''
+		localstatedir = utillib.dirname(envir.HA_VARLIB)
 		
+		for p in ['pacemaker/cib','heartbeat/crm']:
+			if os.path.isfile(localstatedir+'/'+p+'/cib.xml'):
+				utillib.debug("setting CIB_DIR to localstatedir+'/'+p")
+				envir.CIB_DIR = localstatedir+'/'+p
+				break
+
+	def echo_ptest_tool(self):
+		ptest_progs = ['crm_simulate','ptest']
+
+		for f in ptest_progs:
+			if utillib.which(f):
+				break
+
 
 	def compabitility_pcmk(self):				
 		if self.get_crm_daemon_dir():				#have not tested carefully
@@ -96,6 +115,11 @@ class node:
 
 		if self.get_cib_dir():
 			self.get_cib_dir2()
+
+		utillib.debug("setting PCMK_LIB to `dirname $CIB_DIR`")
+		envir.PCMK_LIB = utillib.dirname(envir.CIB_DIR)
+
+		PTEST = self.echo_ptest_tool()
 
 	def high_debug_level1(self):
 		pass
@@ -114,5 +138,13 @@ class node:
 
 	def mktar(self):
 		pass
+
+
+	def cluster_type(self):
+		'''
+		Figure out cluster type
+		'''
+		if len(envir.USER_CLUSTER_TYPE):
+			CLUSTER_TYPE
 
 

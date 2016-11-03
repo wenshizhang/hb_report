@@ -91,11 +91,22 @@ def get_ocf_directories():
 def find_dir(name,path):
 	result = []
 	for root,dirs,files in os.walk(path):
-#		print "dirs is ",dirs
-#		print "files is",files
-#		print "root is",root
+		
 		if name in dirs:
 				result.append(os.path.join(root,name))
 	
 	result_string = ''.join(result)
 	return result_string
+
+
+def which(command):
+	'''
+	Implement of command which
+	'''
+	path = os.getenv("PATH")
+	path_list = path.split(":")
+	
+	for p in path_list:
+		if command in os.listdir(p):
+			print "path is ",p,"command is",command
+			return os.path.join(p,command)

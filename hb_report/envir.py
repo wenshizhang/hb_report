@@ -20,6 +20,8 @@ TO_TIME = 0
 #log time form
 FROM_T = ''
 TO_T = ''
+
+#from command patameters
 NODE_SOURCE = ''
 USER_NODES=[]
 UNIQUE_MSG = ""
@@ -69,6 +71,8 @@ CONFIGURATIONS=['/etc/drbd.conf','/etc/drbd.d','/etc/booth/booth.conf']
 #daemon directories
 CRM_DAEMON_DIR = ''
 PE_STATE_DIR = ''
+CIB_DIR = ''
+PCMK_LIB = ''
 
 
 #from ocf-directories

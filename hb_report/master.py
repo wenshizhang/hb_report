@@ -211,6 +211,7 @@ def run():
 	#get WORKDIR
 	mtr.WORKDIR = mtr.mktemp()
 	mtr.compabitility_pcmk()
+	mtr.cluster_type()
 
 run()
 
