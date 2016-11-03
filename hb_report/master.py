@@ -29,6 +29,7 @@ class master(node):
 
 	-f time: time to start from or a CTS test number
 	-t time: time to finish at (dflt: now)
+	-s	   : do sanitize
 	-d     : don't compress, but leave result in a directory
 	-n nodes: node names for this cluster; this option is additive
 			 (use either -n "a b" or -n a -n b)
@@ -50,7 +51,6 @@ class master(node):
 	-D     : don't invoke editor to write description
 	-Z     : if destination directories exist, remove them instead of exiting
 	         (this is default for CTS)
-	-A     : this is an OpenAIS cluster
 	-S     : single node operation; don't try to start report
 	         collectors on other nodes
 	-v     : increase verbosity
@@ -145,8 +145,8 @@ class master(node):
 					envir.EXTRA_LOGS = []
 				if(args == '-E'):
 					envir.EXTRA_LOGS.append(option)
-				if(args == '-A'):
-					envir.USER_CLUSTER_TYPE = 'openais'
+#				if(args == '-A'):
+#					envir.USER_CLUSTER_TYPE = 'openais'
 				if(args == '-v'):
 					envir.VERBOSITY = envir.VERBOSITY+1
 				if(args == '-d'):

@@ -123,15 +123,24 @@ class node:
 
 		PTEST = self.echo_ptest_tool()
 
+	def get_cluster_type(self):
+		'''
+		User do not input cluster type 
+		We figure out it with ourselves
+		'''
+		if not utillib.ps_grep("corosync"):
+			os.path.isfile('/etc/corosync/corosync.conf') and 
+
+	def cluster_type(self):
+		'''
+		Get clustetr type 
+		'''
+		if not len(envir.USER_CLUSTER_TYPE):
+			self.get_cluster_type()
+
 	def high_debug_level1(self):
 		pass
 
-	def get_cluster_type(self):
-		'''
-		If user do not input cluster type then figure out cluster itself
-		'''
-
-		if utillib.ps_grep(name):
 
 	def conf(self):
 		pass
@@ -145,14 +154,5 @@ class node:
 	def mktar(self):
 		pass
 
-
-	def cluster_type(self):
-		'''
-		Figure out cluster type
-		'''
-		if not len(envir.USER_CLUSTER_TYPE):
-			CLUSTER_TYPE = self.get_cluster_type()
-		else:
-			CLUSTER_TYPE = envir.USER_CLUSTER_TYPE
 
 
