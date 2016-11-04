@@ -37,7 +37,10 @@ def run():
 	#get WORKDIR
 	sla.WORKDIR = sla.mktemp()
 	sla.WORKDIR = sla.WORKDIR+"/"+sla.WE
-	print sla.WORKDIR
+	sla.compabitility_pcmk()
+	sla.cluster_type()
+
+	sla.get_log_var
 
 
 run()

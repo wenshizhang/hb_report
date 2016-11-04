@@ -128,8 +128,17 @@ class node:
 		User do not input cluster type 
 		We figure out it with ourselves
 		'''
-		if not utillib.ps_grep("corosync"):
-			os.path.isfile('/etc/corosync/corosync.conf') and 
+		if utillib.ps_grep("corosync"):
+			if not os.path.isfile('/etc/corosync/corosync.conf') or os.path.isfile(envir.HA_CF):
+				utillib.debug("this is Heartbeat cluster stack")
+				envir.USER_CLUSTER_TYPE = 'heartbeat'
+			else:
+				utillib.debug("this is Corosync cluster stack")
+				envir.USER_CLUSTER_TYPE = 'corosync'
+
+		else:
+			utillib.debug("this is Corosync cluster stack")
+			envir.USER_CLUSTER_TYPE = 'corosync'
 
 	def cluster_type(self):
 		'''
@@ -137,6 +146,51 @@ class node:
 		'''
 		if not len(envir.USER_CLUSTER_TYPE):
 			self.get_cluster_type()
+
+		self.get_another_dirs()
+			
+
+	def get_another_dirs(self):
+		'''
+		Get some dirs
+		'''
+
+		#first get CORE_DIRS and PACKAGES
+		if envir.HA_VARLIB != envir.PCMK_LIB:
+			envir.CORE_DIRS.append(envir.HA_VARLIB+"/cores")
+			envir.CORE_DIRS.append(envir.PCMK_LIB+'/cores')
+		else:
+			envir.CORE_DIRS.append(envir.HA_VARLIB+'/cores')
+
+		packages = 'pacemaker libpacemaker3 pacemaker-pygui pacemaker-pymgmt pymgmt-client openais libopenais2 libopenais3 corosync libcorosync4 resource-agents cluster-glue libglue2 ldirectord libqb0 heartbeat heartbeat-common heartbeat-resources libheartbeat2 booth ocfs2-tools ocfs2-tools-o2cb ocfs2console ocfs2-kmp-default ocfs2-kmp-pae ocfs2-kmp-xen ocfs2-kmp-debug ocfs2-kmp-trace drbd drbd-kmp-xen drbd-kmp-pae drbd-kmp-default drbd-kmp-debug drbd-kmp-trace drbd-heartbeat drbd-pacemaker drbd-utils drbd-bash-completion drbd-xen lvm2 lvm2-clvm cmirrord libdlm libdlm2 libdlm3 hawk ruby lighttpd kernel-default kernel-pae kernel-xen glibc'
+		envir.PACKAGES = packages.split(" ")
+
+		if envir.USER_CLUSTER_TYPE == 'corosync':
+			envir.CONF = '/etc/corosync/corosync.conf'
+			envir.CORE_DIRS.append('/var/lib/corosync')
+			envir.CF_SUPPORT = envir.HA_NOARCHBIN+'/openais_conf_support.sh'
+			envir.MEMBERSHIP_TOOL_OPTS = ''
+
+		else:
+			envir.CONF = envir.HA_CF
+			envir.CF_SUPPORT = envir.HA_NOARCHBIN+'/ha_cf_support.sh'
+			envir.MEMBERSHIP_TOOL_OPTS = '-H'
+
+		envir.B_CONF = utillib.basename(envir.CONF)
+		
+		if os.path.isfile(envir.CF_SUPPORT):
+			os.system('. '+envir.CF_SUPPORT)
+		else:
+			utillib.fatal('no stack specific support:'+envir.CF_SUPPORT)
+	
+	def get_log_var(self):
+		'''
+		Get log variable
+		'''
+		if len(envir.HA_LOGFACILITY):
+			envir.HA_LOGFACILITY = envir.DEFAULT_HA_LOGDACILITY
+			envir.HA_DEBUGLEVEL = 'info'
+			cfdebug = ha_cf_support.getcfvar('debug')
 
 	def high_debug_level1(self):
 		pass

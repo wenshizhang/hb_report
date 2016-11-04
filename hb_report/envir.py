@@ -13,6 +13,12 @@ import re
 
 from crmsh	import utils
 
+#initial
+prefix = '/usr'
+datarootdir = prefix+'/share'
+datadir = '/usr/share'
+HA_NOARCHBIN = datadir+'/crmsh/hb_report'
+
 #unix stamptime form
 FROM_TIME = 0
 TO_TIME = 0
@@ -30,6 +36,7 @@ SSH_OPTS = ''
 DEST = ''
 DESTDIR = '.'
 NOW = ''
+CTS = ''
 HA_LOG = ''
 EDITOR = ''
 SANITIZE = []
@@ -46,6 +53,15 @@ VERBOSITY = 0
 COMPRESS = 1
 SSH_PASSWD_NODES = ''
 TRY_SSH = ['root','hacluster']
+
+
+LC_ALL = 'POSIX'
+PROG = 'report'
+DEFAULT_HA_LOGFACILITY = 'daemon'
+
+HA_LOGFACILITY = ''
+LOGC_CF = ''
+
 
 #the goods
 ANALYSIS_F='analysis.txt'
@@ -68,6 +84,14 @@ CIB_TXT_F='cib.txt'
 COROSYNC_RECORDER_F='fdata.txt'
 CONFIGURATIONS=['/etc/drbd.conf','/etc/drbd.d','/etc/booth/booth.conf']
 
+#configure files
+CORE_DIRS = []
+PACKAGES = []
+CONF = ''
+CF_SUPPORT = ''
+MEMBERSHIP_TOOL_OPTS = ''
+
+
 #daemon directories
 CRM_DAEMON_DIR = ''
 PE_STATE_DIR = ''
@@ -78,4 +102,6 @@ PCMK_LIB = ''
 #from ocf-directories
 HA_BIN = ''
 HA_CF = ''
+HA_VARLIB = ''
+HA_DIR = ''
 

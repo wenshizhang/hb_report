@@ -212,6 +212,10 @@ def run():
 	mtr.WORKDIR = mtr.mktemp()
 	mtr.compabitility_pcmk()
 	mtr.cluster_type()
+	if not len(envir.CTS):
+		mtr.get_log_var()
+	else:
+		mtr.get_cts_log()
 
 run()
 
