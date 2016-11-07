@@ -13,3 +13,7 @@ The defination of node class, it is the father class of master and slave class, 
 This is environment variable configure file, all the  variable is needed during the hb_report run.Kind of important
 ##utillib.py
 This is functions library.
+##corosync_conf_support.py
+This is the corosync cluster support script, this script implement some unique function for corosync cluster
+##ha_cf_support.py
+This script just like corosync_conf_support.py, but this script for heartbeat cluster
