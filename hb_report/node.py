@@ -10,6 +10,8 @@ import	sys
 import	tempfile
 import	envir
 import	utillib
+import	corosync_conf_support
+import	ha_cf_support
 
 from StringIO import StringIO
 from crmsh import config
@@ -178,19 +180,23 @@ class node:
 
 		envir.B_CONF = utillib.basename(envir.CONF)
 		
-		if os.path.isfile(envir.CF_SUPPORT):
-			os.system('. '+envir.CF_SUPPORT)
-		else:
+		if not os.path.isfile(envir.CF_SUPPORT):
 			utillib.fatal('no stack specific support:'+envir.CF_SUPPORT)
 	
 	def get_log_var(self):
 		'''
 		Get log variable
 		'''
-		if len(envir.HA_LOGFACILITY):
-			envir.HA_LOGFACILITY = envir.DEFAULT_HA_LOGDACILITY
-			envir.HA_DEBUGLEVEL = 'info'
+		if not len(envir.HA_LOGFACILITY):
+			envir.HA_LOGFACILITY = envir.DEFAULT_HA_LOGFACILITY
+
+		envir.HA_DEBUGLEVEL = 'info'
+		if envir.USER_CLUSTER_TYPE == 'heartbeat':
+			print 'do heartbeat,cluster type is',envir.USER_CLUSTER_TYPE
 			cfdebug = ha_cf_support.getcfvar('debug')
+		else:
+			print 'do corosync,cluster type is',envir.USER_CLUSTER_TYPE
+			cfdebug = corosync_conf_support.iscfvartrue('debug')
 
 	def high_debug_level1(self):
 		pass

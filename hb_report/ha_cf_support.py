@@ -1,6 +1,6 @@
 import os
 import sys
-import envit
+import envir
 import utillib
 
 
