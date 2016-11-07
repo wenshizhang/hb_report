@@ -8,6 +8,9 @@ import	getopt
 import	envir
 import	socket
 import	utillib
+import	corosync_conf_support
+import	ha_cf_support
+
 from crmsh	import logtime
 from crmsh	import utils
 from crmsh	import logparser
@@ -191,7 +194,9 @@ class master(node):
 
 	def send_envir(self):
 		pass
-
+	
+	def get_cts_log(self):
+		ctslog = utillib.findmsg('CTS: Stack:')
 
 
 
@@ -213,7 +218,11 @@ def run():
 	mtr.compabitility_pcmk()
 	mtr.cluster_type()
 	if not len(envir.CTS):
-		mtr.get_log_var()
+		if envir.USER_CLUSTER_TYPE == 'corosync':
+			corosync_conf_support.get_log_var()
+			utillib.debug('log setting :facility = '+envir.HA_LOGFACILITY+' logfile = '+envir.HA_LOGFILE+' debug file = '+envir.HA_DEBUGFILE)
+		else:
+			ha_cf_support.get_log_var()
 	else:
 		mtr.get_cts_log()
 

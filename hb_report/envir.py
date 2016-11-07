@@ -55,12 +55,17 @@ SSH_PASSWD_NODES = ''
 TRY_SSH = ['root','hacluster']
 
 
+#cluster type support
+HA_LOGFILE = ''
+HA_DEBUGFILE = ''
+
+
 LC_ALL = 'POSIX'
 PROG = 'report'
 DEFAULT_HA_LOGFACILITY = 'daemon'
 
 HA_LOGFACILITY = ''
-LOGC_CF = ''
+LOGD_CF = ''
 
 
 #the goods

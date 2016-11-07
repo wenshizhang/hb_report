@@ -87,6 +87,24 @@ def get_ocf_directories():
 			envir.HA_BIN = get_value(line,"HA_BIN")
 		line = f.readline()
 
+def logd_getcfvar(pattern):
+	'''
+	TODO
+	'''
+	f = open(envir.LOGD_CF)
+	for line in f:
+		if line.startswith('#'):
+			continue
+		if line.startwith(pattern):
+			pass
+
+def get_logd_logvars():
+	'''
+	unless logfacility is set to none, heartbeat/ha_logd are
+	going to log through syslog
+	TODO
+	'''
+	envir.HA_LOGFACILITY = logd_getcfvar('logfacility')
 
 def find_dir(name,path):
 	result = []
@@ -125,3 +143,8 @@ def ps_grep(proname):
 				return 0
 
 	return 1
+
+def findmsg(mark):
+	syslog = '/var/log /var/logs /var/syslog /var/adm /var/log/ha /var/log/cluster /var/log/pacemaker /var/log/heartbeat /var/log/crm /var/log/corosync'
+	syslogdirs = syslog.split(' ')
+	print syslogdirs

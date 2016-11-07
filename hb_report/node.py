@@ -192,11 +192,17 @@ class node:
 
 		envir.HA_DEBUGLEVEL = 'info'
 		if envir.USER_CLUSTER_TYPE == 'heartbeat':
-			print 'do heartbeat,cluster type is',envir.USER_CLUSTER_TYPE
 			cfdebug = ha_cf_support.getcfvar('debug')
 		else:
-			print 'do corosync,cluster type is',envir.USER_CLUSTER_TYPE
-			cfdebug = corosync_conf_support.iscfvartrue('debug')
+			if corosync_conf_support.iscfvartrue('debug'):
+				HA_LOGDEVEL = 'debug'
+		if corosync_conf_support.uselogd():
+			if not os.path.isfile(envir.LOGD_CF):
+				#no configurations: use default
+				return 
+			else:
+				utillib.debug('reading log settings from '+envir.LOGD_CF)
+				corosync.get_logd_logvars()
 
 	def high_debug_level1(self):
 		pass
