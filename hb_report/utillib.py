@@ -147,4 +147,30 @@ def ps_grep(proname):
 def findmsg(mark):
 	syslog = '/var/log /var/logs /var/syslog /var/adm /var/log/ha /var/log/cluster /var/log/pacemaker /var/log/heartbeat /var/log/crm /var/log/corosync'
 	syslogdirs = syslog.split(' ')
-	print syslogdirs
+	favourites = 'ha-*'
+	log = []
+
+	for d in syslogdirs:
+		if not os.path.isdir(d):
+			continue
+		subdir = os.listdir(d)
+		for s in subdir:
+			if s.startswith('ha-'):
+				if s.find(mark) != -1:
+					log.append(s)
+		if len(log):
+			break
+		for s in subdir:
+			if s.find(mark) != -1:
+				log.append(s)
+		if len(log):
+			break
+	
+	if len(log):
+		dirs = os.listdir(log[0])
+		dirsname = ' '.join(dirs)
+		debug('found HA log at '+dirname)
+	else:
+		debug('no HA log found in '+syslog)
+	
+	return dirname

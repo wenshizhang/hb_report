@@ -195,8 +195,15 @@ class master(node):
 	def send_envir(self):
 		pass
 	
+	def get_user_node(self,ctslog):
+
+	
 	def get_cts_log(self):
 		ctslog = utillib.findmsg('CTS: Stack:')
+		utillib.debug('Using CTS control file :'+ctslog)
+		#TODO
+		envir.USER_NODES = self.get_user_node(ctslog)
+		envir.NODES_SOURCE = 'user'
 
 
 
