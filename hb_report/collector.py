@@ -40,8 +40,11 @@ def run():
 	sla.compabitility_pcmk()
 	sla.cluster_type()
 
-	sla.get_log_var
-
+	if envir.USER_CLUSTER_TYPE == 'corosync':
+		corosync_conf_support.get_log_var()
+		utillib.debug('log setting :facility = '+envir.HA_LOGFACILITY+' logfile = '+envir.HA_LOGFILE+' debug file = '+envir.HA_DEBUGFILE)
+	else:
+		ha_cf_support.get_log_var()
 
 run()
 

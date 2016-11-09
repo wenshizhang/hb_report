@@ -29,7 +29,7 @@ TO_T = ''
 
 #from command patameters
 NODE_SOURCE = ''
-USER_NODES=[]
+USER_NODES = []
 UNIQUE_MSG = ""
 SSH_USER = []
 SSH_OPTS = ''

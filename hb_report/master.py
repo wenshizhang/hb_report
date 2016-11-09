@@ -159,8 +159,6 @@ class master(node):
 			envir.SSH_USER.append("root")
 			envir.SSH_USER.append("hacluster")
 
-
-
 	def is_node(self):
 		pass
 
@@ -195,14 +193,18 @@ class master(node):
 	def send_envir(self):
 		pass
 	
-	def get_user_node(self,ctslog):
+	def get_user_node_cts(self,ctslog):
+		#TODO
+		print 'This need to get cts user nodes'
 
 	
 	def get_cts_log(self):
 		ctslog = utillib.findmsg('CTS: Stack:')
-		utillib.debug('Using CTS control file :'+ctslog)
+		debug_msg = 'Using CTS control file :'+ctslog
+#		utillib.debug('Using CTS control file :'+ctslog)
+		utillib.debug(debug_msg)
 		#TODO
-		envir.USER_NODES = self.get_user_node(ctslog)
+#		envir.USER_NODES = self.get_user_node_cts(ctslog)
 		envir.NODES_SOURCE = 'user'
 
 
@@ -224,7 +226,7 @@ def run():
 	mtr.WORKDIR = mtr.mktemp()
 	mtr.compabitility_pcmk()
 	mtr.cluster_type()
-	if not len(envir.CTS):
+	if len(envir.CTS):
 		if envir.USER_CLUSTER_TYPE == 'corosync':
 			corosync_conf_support.get_log_var()
 			utillib.debug('log setting :facility = '+envir.HA_LOGFACILITY+' logfile = '+envir.HA_LOGFILE+' debug file = '+envir.HA_DEBUGFILE)
@@ -232,6 +234,7 @@ def run():
 			ha_cf_support.get_log_var()
 	else:
 		mtr.get_cts_log()
+	utillib.get_nodes()
 
 run()
 

@@ -4,8 +4,11 @@ import sys
 import socket
 import re
 import envir
+import time
+import StringIO
 
 from crmsh	import utils
+
 
 #set variables default
 def setvarsanddefaults():
@@ -128,9 +131,22 @@ def which(command):
 		if command in os.listdir(p):
 			return os.path.join(p,command)
 
+def ps_grep_pid(pid):
+	'''
+	Like function ps_grep, base on pid find matches
+	'''
+	dirs = os.listdir('/proc')
+	
+	for d in dirs:
+		if re.match('\d+',d):
+			if d == pid:
+				return False
+
+	return True
+
 def ps_grep(proname):
 	'''
-	Ps and grep 
+	Ps and grep, if got match then return False, otherwise return True
 	'''
 	dirs = os.listdir("/proc")
 
@@ -139,16 +155,16 @@ def ps_grep(proname):
 			path = os.path.join('/proc',d+'/cmdline')
 			f = open(path,'r')
 			msg = f.readline()
-			if msg.find(proname) != -1:
-				return 0
-
-	return 1
+			if msg.find(proname) != -1 and msg.find('grep') == -1:
+				return False
+	return True
 
 def findmsg(mark):
 	syslog = '/var/log /var/logs /var/syslog /var/adm /var/log/ha /var/log/cluster /var/log/pacemaker /var/log/heartbeat /var/log/crm /var/log/corosync'
 	syslogdirs = syslog.split(' ')
 	favourites = 'ha-*'
 	log = []
+	dirname = ''
 
 	for d in syslogdirs:
 		if not os.path.isdir(d):
@@ -174,3 +190,84 @@ def findmsg(mark):
 		debug('no HA log found in '+syslog)
 	
 	return dirname
+
+def iscrmrunning():
+	'''
+	Test whether crm is running
+	if running return True, otherwise return False
+	'''
+	result = 0
+	#if ps and grep find the crmd then return True
+	if  not ps_grep('crmd'):
+		return True
+	pid = os.fork()
+	if not pid:
+		result = os.system('crmadmin -D >/dev/null 2>&1')
+		if result:
+			return True
+		return False
+	else:
+		for i in range(100):
+			try:
+				os.waitpid(pid,0)
+			except:
+				break;
+			time.sleep(1)
+		if not ps_grep_pid(pid):
+			os.kill(pid,signal.SIGKILL)
+
+def get_crm_nodes():
+	'''
+	Use crm to get all node in current cluster
+	Before call this function, must ensure crm is running, otherwise will get exception
+	'''
+	rc = 0
+	from crmsh import ui_context
+	from crmsh import ui_root
+	from crmsh import msg
+	from crmsh import options
+	ui = ui_root.Root()
+	context = ui_context.Context(ui)
+#	try:
+	try:
+		oldout = sys.stdout
+		sys.stdout = myout= StringIO()
+
+		if not context.run('node server'):
+			rc = 1
+		sys.stdout = oldout
+		nodes = myout.getvalue()
+		print node
+	except ValueError as msg:
+		rc = 1
+		msg.common_err(msg)
+
+#    except KeyboardInterrupt:
+#		if options.interactive and not options.batch:
+#			print("Ctrl-C, leaving")
+#           context.quit(1)
+	return rc
+
+
+def get_nodes():
+	# 1. set bu user
+	if len(envir.USER_NODES):
+		print envir.USER_NODES
+	# 2. running cr,
+	elif iscrmrunning():
+		debug('querying CRM for nodes')
+		get_crm_nodes()
+	# 3. hostcache
+
+
+
+
+
+
+
+
+
+
+
+
+
