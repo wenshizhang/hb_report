@@ -206,6 +206,28 @@ class master(node):
 		#TODO
 #		envir.USER_NODES = self.get_user_node_cts(ctslog)
 		envir.NODES_SOURCE = 'user'
+		
+	def is_member(self):
+		'''
+		Check node from node list is member or not
+		need to improve 
+		if func can know user input the node do not belong to cluster 
+		the hb_report can output the message then exit
+		envir.NODE_SOURCE can tell the func where did hv_report get node
+		only from user need to check
+		'''
+		if envir.NODE_SOUECE != 'user':
+			return 
+		NODECNT = len(envir.NODE)
+		if not NODECNT:
+			utillib.fatal('could not figure out a list of nodes; is this a cluster node?')
+
+	def is_node():
+		if THIS_IS_NODE:
+			return True
+		return False
+	
+	def findsshuser():
 
 
 
@@ -234,7 +256,32 @@ def run():
 			ha_cf_support.get_log_var()
 	else:
 		mtr.get_cts_log()
+
+#
+#part 1:get nodes
+#
 	utillib.get_nodes()
+	utillib.debug('nodes: '+' '.join(envir.USER_NODES))
+	mtr.is_member()
+
+	#this is node
+
+	for n in envir.NODE:
+		if n == mtr.WE:
+			THIS_IS_NODE = 1
+
+	if not is_node and envir.NODE_SOUECE != 'user':
+		utillib.warn('this is not a node and you didn\'t specify a list of nodes using -n')
+	
+#
+#part 2: ssh business
+#
+	#find out id ssh works
+	if envir.NO_SSH:
+		self.findsshuser()
+		if envir.SSH_USER:
+			envir.SSH_OPTS = envir.SSH_OPTS+' -o User='+envir.SSH_USER 
+
 
 run()
 

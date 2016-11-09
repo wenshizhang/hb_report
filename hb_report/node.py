@@ -20,7 +20,7 @@ class node:
 	SSH_PASSWD = ''
 	WE = ''
 	WORKDIR = ''
-	THIS_IS_NODE = ''
+	THIS_IS_NODE = 0
 
 	def mktemp(self):
 		tmpdir = tempfile.mkdtemp()

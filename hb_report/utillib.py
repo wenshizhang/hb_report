@@ -228,24 +228,24 @@ def get_crm_nodes():
 	from crmsh import options
 	ui = ui_root.Root()
 	context = ui_context.Context(ui)
-#	try:
+
+	if len(envir.USER_NODES):
+		return rc
 	try:
 		oldout = sys.stdout
-		sys.stdout = myout= StringIO()
+		sys.stdout = myout= StringIO.StringIO()
 
 		if not context.run('node server'):
 			rc = 1
 		sys.stdout = oldout
 		nodes = myout.getvalue()
-		print node
+		nodes = nodes.rstrip()
+		envir.USER_NODES = nodes.split('\n')
+		debug('Get CRM node list: '+' '.join(envir.USER_NODES))
 	except ValueError as msg:
 		rc = 1
 		msg.common_err(msg)
-
-#    except KeyboardInterrupt:
-#		if options.interactive and not options.batch:
-#			print("Ctrl-C, leaving")
-#           context.quit(1)
+	
 	return rc
 
 
@@ -257,12 +257,23 @@ def get_nodes():
 	elif iscrmrunning():
 		debug('querying CRM for nodes')
 		get_crm_nodes()
+		envit.NODE_SOURCE = 'crm'
 	# 3. hostcache
-
-
-
-
-
+	elif os.path.isfile(envir.HA_VARLIB+'/hostcache'):
+		utillib.debug('reading nodes from '+envir.HA_VARLIB+'/hostcache')
+		get_hostcache_node()
+		envir.NODE_SOURCE = 'hostcache'
+	# 4. ha.cf
+	elif envir.USER_CLUSTER_TYPE == 'heartbeat':
+		utillib.debug('reading node from ha.cf')
+		getcfvar('node')
+		envir.NODE_SOURCE = 'ha.cf'
+	# 5.of the cluster's stopped, try the CIB
+	elif os.path.isfile(envir.CIB_DIR+'/'+envir.CIB_F):
+		utillib.debug('reading node from the archived'+envir.CIB_DIR+'/'+envir.CIB_F)
+		CIB_file = os.path.join(envir.CIB_DIR,envir.CIB_F)
+		get_crm_node()
+		envir.NODE_SOURCE = 'crm'
 
 
 
