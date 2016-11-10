@@ -228,6 +228,11 @@ class master(node):
 		return False
 	
 	def findsshuser():
+		ssh_user = '__undef'
+		if not len(envir.SSH_USER):
+			try_user_list = '__default '+' '.join(envir.TRY_SSH)
+		else:
+			try_user_list = ' '.join(envir.SSH_USER)
 
 
 
@@ -277,9 +282,9 @@ def run():
 #part 2: ssh business
 #
 	#find out id ssh works
-	if envir.NO_SSH:
+	if len(envir.NO_SSH):
 		self.findsshuser()
-		if envir.SSH_USER:
+		if len(envir.SSH_USER):
 			envir.SSH_OPTS = envir.SSH_OPTS+' -o User='+envir.SSH_USER 
 
 
