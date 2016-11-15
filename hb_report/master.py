@@ -10,6 +10,7 @@ import	socket
 import	utillib
 import	corosync_conf_support
 import	ha_cf_support
+import	subprocess
 
 from crmsh	import logtime
 from crmsh	import utils
@@ -101,6 +102,9 @@ class master(node):
 
 
 	def analyzed_argvment(self,argv):
+#		if len(argv) < 2:
+#			self.usage()
+
 		try:
 			opt,arg = getopt.getopt(sys.argv[1:],"hsQSDCZMAvdf:t:n:u:X:l:e:p:L:E:")
 			if(len(arg)>1):
@@ -216,24 +220,91 @@ class master(node):
 		envir.NODE_SOURCE can tell the func where did hv_report get node
 		only from user need to check
 		'''
-		if envir.NODE_SOUECE != 'user':
+		if envir.NODE_SOURCE != 'user':
 			return 
 		NODECNT = len(envir.NODE)
 		if not NODECNT:
 			utillib.fatal('could not figure out a list of nodes; is this a cluster node?')
 
-	def is_node():
+	def is_node(self):
 		if THIS_IS_NODE:
 			return True
 		return False
 	
-	def findsshuser():
+	def testsshconn(self,user):
+		ret = 1
+		opts = envir.SSH_OPTS
+		opts.append('-T')
+		opts.append('-o Batchmode=yes')
+		opts.append(user)
+		opts.append('true')
+		command = ['ssh']
+		command.extend(opts)
+#		print command
+
+#		print envir.SSH_OPTS+' -T -o Batchmode=yes '+user+' true'
+		ret = subprocess.call(command)
+		if not ret:
+			return True
+
+		return False
+
+
+	def findsshuser(self):
+		'''
+		If user not provide ssh users, then hb_report find ssh user by it self
+		'''
+		rc = 0
+
 		ssh_user = '__undef'
 		if not len(envir.SSH_USER):
 			try_user_list = '__default '+' '.join(envir.TRY_SSH)
 		else:
 			try_user_list = ' '.join(envir.SSH_USER)
 
+		#debug message
+		utillib.debug('FROM FINDSSHUSER: node name is '+' '.join(envir.USER_NODES))
+
+		for n in envir.USER_NODES:
+			rc = 1
+			if n == self.WE:
+			# Ahh, It' me, will break!
+				continue
+			for u in try_user_list.split(' '):
+				if u != '__default':
+					ssh_s = u+'@'+n
+				else:
+					ssh_s = n
+
+				if self.testsshconn(ssh_s):
+					utillib.debug('ssh '+ssh_s+' OK')
+					ssh_user = u
+					try_ssh_list = u
+					rc = 0
+					break
+				else:
+					utillib.debug('ssh '+ssh_s+' failed')
+
+			if rc:
+				envir.SSH_PASSWD_NODES = envir.SSH_PASSWD_NODES+n
+
+		if len(envir.SSH_PASSWD_NODES):
+			utillib.warn('passwordless ssh to node(s) '+envir.SSH_PASSWD_NODES+' does not work')
+		
+		if ssh_user == '__undef':
+			return 1
+		if ssh_user != '__default':
+			envir.SSH_USER = ssh_user			
+			#ssh user is default
+			
+		return 0
+
+	def getlog(self):
+		'''
+		Get the logs
+		'''
+		outf = os.path.join(self.WORKDIR,envir.HALOG_F)
+		print outf
 
 
 def run():
@@ -245,6 +316,7 @@ def run():
 
 	mtr = master()
 	mtr.analyzed_argvment(sys.argv)
+	print 'DEST is',envir.DEST
 	
 	#who am i
 	mtr.WE= socket.gethostname()
@@ -271,22 +343,45 @@ def run():
 
 	#this is node
 
-	for n in envir.NODE:
+	for n in envir.USER_NODES:
 		if n == mtr.WE:
 			THIS_IS_NODE = 1
 
-	if not is_node and envir.NODE_SOUECE != 'user':
+	if not mtr.is_node and envir.NODE_SOUECE != 'user':
 		utillib.warn('this is not a node and you didn\'t specify a list of nodes using -n')
 	
 #
 #part 2: ssh business
 #
 	#find out id ssh works
-	if len(envir.NO_SSH):
-		self.findsshuser()
+	if not envir.NO_SSH:
+		mtr.findsshuser()
 		if len(envir.SSH_USER):
-			envir.SSH_OPTS = envir.SSH_OPTS+' -o User='+envir.SSH_USER 
+			envir.SSH_OPTS = envir.SSH_OPTS.append('-o User='+envir.SSH_USER)
+#
+#part 3: root things
+#
+	SUDO = ''
+	euid = os.geteuid()
+	if not len(envir.SSH_USER) and euid != 0:
+		utillib.debug('ssh user other than root, use sudo')
+		SUDO = 'sudo -u root'
 
-
-run()
+	LOCAL_SUDO = ''
+	if not euid:
+		utillib.debug('local user ither than root, use sudo')
+		LOCAL_SUDO = 'sudo -u root'
+	
+#
+#part 4: find the logs and cut out the segment for the period
+#
+	if THIS_IS_NODE:
+		mtr.getlog()
+		
+try:
+	run()
+except OSError as msg:
+	print 'Get an Error'
+	if os.geteuid():
+		print 'Please use root'
 

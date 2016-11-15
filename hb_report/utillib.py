@@ -24,6 +24,7 @@ def setvarsanddefaults():
 	date = datetime.datetime.date(now).strftime("%a-%d-%m-%Y")
 	envir.DEST = "hb_report-"+date
 	envir.SANITIZE.append("passw.*")
+	envir.SSH_OPTS = ['-o StrictHostKeyChecking=no','-o EscapeChar=none','-o ConnectTimeout=15']
 	envir.LOG_PATTERNS.append("CRIT:")
 	envir.LOG_PATTERNS.append("ERROR:")
 
@@ -257,7 +258,7 @@ def get_nodes():
 	elif iscrmrunning():
 		debug('querying CRM for nodes')
 		get_crm_nodes()
-		envit.NODE_SOURCE = 'crm'
+		envir.NODE_SOURCE = 'crm'
 	# 3. hostcache
 	elif os.path.isfile(envir.HA_VARLIB+'/hostcache'):
 		utillib.debug('reading nodes from '+envir.HA_VARLIB+'/hostcache')
