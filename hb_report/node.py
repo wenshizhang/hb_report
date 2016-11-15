@@ -12,6 +12,8 @@ import	envir
 import	utillib
 import	corosync_conf_support
 import	ha_cf_support
+import	datetime
+import	subprocess
 
 from StringIO import StringIO
 from crmsh import config
@@ -22,8 +24,12 @@ class node:
 	WORKDIR = ''
 	THIS_IS_NODE = 0
 
-	def mktemp(self):
+	def mktemp(self,dest=''):
+		print 'dest is',dest
 		tmpdir = tempfile.mkdtemp()
+		if len(dest):
+			path = os.path.join(tmpdir,dest)
+			os.mkdir(path)
 		return tmpdir
 
 	def get_crm_daemon_dir(self):
@@ -50,6 +56,48 @@ class node:
 						utillib.debug("setting CRM_DAEMON_CRM to"+p+'/'+d+'/'+d2+'/crmd')
 						envir.CRM_DAEMON_DIR = p+'/'+d+'/'+d2+'/crmd'
 						break
+	
+	def collect_journal(self,workdir):
+		'''
+		Collect Journal from Systemd
+		'''
+		from_time = str(int(envir.FROM_TIME))
+		to_time = str(int(envir.TO_TIME))
+		outf = os.path.join(workdir,envir.JOURNAL_F)
+		if utillib.do_which('journalctl'):
+			if from_time.isdigit() and from_time != '0':
+				from_t = datetime.datetime.fromtimestamp(int(from_time)).strftime("+%Y-%m-%d %H:%M")
+			#do not know from_time in which cases
+			elif from_time.isdigit():
+				from_t = datetime.datetime.fromtimestamp(int(from_time)).strftime("+%Y-%m-%d %H:%M")
+
+			#to_time
+			if to_time.isdigit() and to_time != '0':
+				to_t = datetime.datetime.fromtimestamp(int(to_time)).strftime("+%Y-%m-%d %H:%M")
+			#do not know from_time in which cases
+			elif to_time.isdigit():
+				to_t = datetime.datetime.fromtimestamp(int(to_time)).strftime("+%Y-%m-%d %H:%M")
+
+			print to_t,from_t
+
+			if os.path.isfile(outf):
+				utillib.warning(outf+' already exists')
+			
+			fd = open(outf,"w")
+			fd.write('journalctl from: '+from_time+' until: '+to_time+' from_time '+from_t+' to_time: '+to_time+'\n')
+			fd.close()
+
+#			subprocess.call(['journalctl','-o short-iso','--since "'+from_time+'"','--until "'+to_time'"','--no-pager','|' tail -n +2 > $outf])
+
+
+	def getlog(self):
+		'''
+		Get Specify Logs
+		'''
+		outf = os.path.join(self.WORKDIR,envir.HALOG_F)
+
+		#collect journal firm systemd
+		self.collect_journal(self.WORKDIR)
 
 	def get_pe_state_dir(self):
 		'''
@@ -214,8 +262,6 @@ class node:
 	def check_this_is_node(self):
 		pass
 
-	def getlog(self):
-		pass
 
 	def mktar(self):
 		pass

@@ -276,6 +276,18 @@ def get_nodes():
 		get_crm_node()
 		envir.NODE_SOURCE = 'crm'
 
+def do_which(command):
+	path = []
+	path = os.environ['PATH'].split(':')
+
+	for n in path:
+		dirlist = os.listdir(n)
+		if command in dirlist:
+			return True
+	
+	return False
+
+
 
 
 

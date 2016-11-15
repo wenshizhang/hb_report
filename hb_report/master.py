@@ -99,11 +99,15 @@ class master(node):
 	  IT IS YOUR RESPONSIBILITY TO PROTECT THE DATA FROM EXPOSURE!
 
 			'''
+		sys.exit(1)
 
 
 	def analyzed_argvment(self,argv):
 #		if len(argv) < 2:
 #			self.usage()
+		print argv
+		if  '-f' not in argv:
+			self.usage('short')
 
 		try:
 			opt,arg = getopt.getopt(sys.argv[1:],"hsQSDCZMAvdf:t:n:u:X:l:e:p:L:E:")
@@ -299,13 +303,6 @@ class master(node):
 			
 		return 0
 
-	def getlog(self):
-		'''
-		Get the logs
-		'''
-		outf = os.path.join(self.WORKDIR,envir.HALOG_F)
-		print outf
-
 
 def run():
 	'''
@@ -316,13 +313,13 @@ def run():
 
 	mtr = master()
 	mtr.analyzed_argvment(sys.argv)
-	print 'DEST is',envir.DEST
 	
 	#who am i
 	mtr.WE= socket.gethostname()
 	
 	#get WORKDIR
-	mtr.WORKDIR = mtr.mktemp()
+	mtr.WORKDIR = mtr.mktemp(envir.DEST)
+	mtr.WORKDIR = os.path.join(mtr.WORKDIR,envir.DEST)
 	mtr.compabitility_pcmk()
 	mtr.cluster_type()
 	if len(envir.CTS):
