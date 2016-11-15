@@ -378,7 +378,7 @@ def run():
 try:
 	run()
 except OSError as msg:
-	print 'Get an Error'
+	print 'Get an Error',msg
 	if os.geteuid():
 		print 'Please use root'
 

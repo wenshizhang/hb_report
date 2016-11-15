@@ -59,7 +59,7 @@ class node:
 	
 	def collect_journal(self,workdir):
 		'''
-		Collect Journal from Systemd
+		Collect Journal from Systemd, then write the result to file journal.log 
 		'''
 		from_time = str(int(envir.FROM_TIME))
 		to_time = str(int(envir.TO_TIME))
@@ -78,18 +78,26 @@ class node:
 			elif to_time.isdigit():
 				to_t = datetime.datetime.fromtimestamp(int(to_time)).strftime("+%Y-%m-%d %H:%M")
 
-			print to_t,from_t
-
 			if os.path.isfile(outf):
 				utillib.warning(outf+' already exists')
 			
 			fd = open(outf,"w")
 			fd.write('journalctl from: '+from_time+' until: '+to_time+' from_time '+from_t+' to_time: '+to_time+'\n')
+
+			#use journalctl to get log messages
+			cmd1 = ['journalctl','-o','short-iso','--since',from_t[1:],'--until',to_t[1:],'--no-pager']
+			cmd2 = ['tail','-n','+2']
+			jnl_process = subprocess.Popen(cmd1,stdout = subprocess.PIPE,stderr=subprocess.STDOUT)
+			grep_process = subprocess.Popen(cmd2,stdin = jnl_process.stdout,stdout=subprocess.PIPE)
+			output = grep_process.communicate()[0]
+			fd.write(output)
 			fd.close()
 
-#			subprocess.call(['journalctl','-o short-iso','--since "'+from_time+'"','--until "'+to_time'"','--no-pager','|' tail -n +2 > $outf])
+	def findlog(self):
+		logf = ''
 
-
+		if not len()
+	
 	def getlog(self):
 		'''
 		Get Specify Logs
@@ -98,6 +106,15 @@ class node:
 
 		#collect journal firm systemd
 		self.collect_journal(self.WORKDIR)
+		
+		if len(envir.HA_LOG):
+			if not os.path.isfile(envir.HA_LOG):
+				utillib.warn(envir.HA_LOG+' not found; We will try to find log ourselves')
+			envir.HA_LOG = ''
+
+		if envir.HA_LOG == '':
+			envir.HA_LOG = self.findlog()
+
 
 	def get_pe_state_dir(self):
 		'''
