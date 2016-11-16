@@ -61,6 +61,7 @@ class node:
 		'''
 		Collect Journal from Systemd, then write the result to file journal.log 
 		'''
+		global outf
 		from_time = str(int(envir.FROM_TIME))
 		to_time = str(int(envir.TO_TIME))
 		outf = os.path.join(workdir,envir.JOURNAL_F)
@@ -94,9 +95,33 @@ class node:
 			fd.close()
 
 	def findlog(self):
+		'''
+		First try syslog files, if none found then use the
+		logfile/debugfile settings
+		'''
 		logf = ''
 
-		if not len()
+		if  len(envir.HA_LOGFACILITY):
+			logf = utillib.findmsg()
+
+		if os.path.isfile(logf):
+			return logf
+
+		if os.path.isfile(os.path.join(self.WORKDIR,envir.JOURNAL_F)):
+			return os.path.join(self.WORKDIR,envir.JOURNAL_F)
+
+		if os.path.isfile(envir.PCMK_LOG):
+			return envir.PCMK_LOG
+
+		if len(envir.HA_DEBUGFILE):
+			snd_logf = envir.HA_DEBUGFILE
+			return envir.HA_DEBUGFILE
+		else:
+			snd_logf = envir.HA_LOGFILE
+			return envir.HA_LOGFILE
+
+		if len(snd_logf):
+			utillib.debug('will try with '+snd_logf)
 	
 	def getlog(self):
 		'''
@@ -111,9 +136,38 @@ class node:
 			if not os.path.isfile(envir.HA_LOG):
 				utillib.warn(envir.HA_LOG+' not found; We will try to find log ourselves')
 			envir.HA_LOG = ''
-
+		
 		if envir.HA_LOG == '':
 			envir.HA_LOG = self.findlog()
+
+		if len(envir.HA_LOG) or not os.path.isfile(envir.HA_LOG):
+			if len(envir.CTS):
+				#argvment is envir.CTS
+				msg = self.cts_findlogseg()
+
+				fd = open(outf,"a")
+				fd.write(msg)
+				fd.close()
+			else:
+				utillib.warning('no log at'+self.WE)
+				return 
+		if not envir.FROM_TIME:
+			utillib.warning("a log found; but we cannot slice it")
+			utillib.warning("please check the time you input")
+		elif len(envir.CTS):
+			#argvment is envir.CTS and envir.HA_LOG
+			msg = cts_findlogmseg()
+
+			fd = open(outf,"a")
+			fd.write(msg)
+			fd.close()
+
+		else:
+			getstampproc = utillib.find_getstampproc()
+
+
+
+
 
 
 	def get_pe_state_dir(self):

@@ -17,7 +17,8 @@ def setvarsanddefaults():
 	'''
 	now = datetime.datetime.now()
 	now_string = now.strftime("%Y-%m-%d %H:%M:%S.%f")
-	envir.UNIQUE_MSG="Mark:HB_REPORT:"+now_string
+	now_t = utils.parse_to_timestamp(now_string)
+	envir.UNIQUE_MSG="Mark:HB_REPORT:"+str(int(now_t))
 	NOW = now
 
 	envir.TO_TIME = utils.parse_to_timestamp(now_string)
@@ -286,6 +287,72 @@ def do_which(command):
 			return True
 	
 	return False
+
+def do_greple(dirs,form):
+	'''
+	In dirs directoriy find file text  match form
+	Like grep -l -e, return the match name when get the first match 
+	'''
+	files = os.listdir(dirs)
+	log = ''
+	
+	for f in files:
+		#pass directires
+		if not os.path.isfile(f):			
+			continue
+
+		if f.find("ha-") != -1:
+			fd = open(f,'r')
+			txt = fd.readline()
+			#hit the targrt
+			while txt:
+				if txt.find(form) != -1:
+					return f
+				txt = fd.readline()
+			fd.close()
+
+	for f in files:
+
+		if not os.path.isfile(f):
+			continue
+
+		fd = open(f,'r')
+		txt = fd.readline()
+		#hit the targrt
+		while txt:
+			if txt.find(form) != -1:
+				return f
+			txt = fd.readline()
+		fd.close()
+		
+	return log
+
+
+def findmsg():
+	'''
+	Found HA Log
+	'''
+	dirs="/var/log /var/logs /var/syslog /var/adm /var/log/ha /var/log/cluster /var/log/pacemaker /var/log/heartbeat /var/log/crm /var/log/corosync /var/log/openais"
+	syslogdirs = dirs.split()
+	favourites ='ha-*'
+	mark = envir.UNIQUE_MSG
+	log = []
+
+	for f in syslogdirs:
+		#grep pass directries
+		if not os.path.isdir(f):
+			continue
+		log = do_greple(f,mark)
+	
+	if not len(log):
+		debug('no HA log found in '+dirs)
+	else:
+		debug('found HA log at'+' '.join(log))
+	
+	return log
+
+
+
 
 
 

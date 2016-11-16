@@ -105,7 +105,6 @@ class master(node):
 	def analyzed_argvment(self,argv):
 #		if len(argv) < 2:
 #			self.usage()
-		print argv
 		if  '-f' not in argv:
 			self.usage('short')
 
@@ -167,6 +166,11 @@ class master(node):
 			envir.SSH_USER.append("root")
 			envir.SSH_USER.append("hacluster")
 
+	def cts_findlogseg():
+		'''
+		'''
+		#TODO
+		utillib.debug('This is cts find log function, need to be finished later!:)')
 	def is_node(self):
 		pass
 
@@ -375,10 +379,10 @@ def run():
 	if THIS_IS_NODE:
 		mtr.getlog()
 		
-try:
-	run()
-except OSError as msg:
-	print 'Get an Error',msg
-	if os.geteuid():
-		print 'Please use root'
+#try:
+run()
+#except OSError as msg:
+#	print 'Get an Error',msg
+#	if os.geteuid():
+#		print 'Please use root'
 
