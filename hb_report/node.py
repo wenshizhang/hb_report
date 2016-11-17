@@ -122,6 +122,9 @@ class node:
 
 		if len(snd_logf):
 			utillib.debug('will try with '+snd_logf)
+
+	def dumplogset():
+		#TODO
 	
 	def getlog(self):
 		'''
@@ -163,11 +166,26 @@ class node:
 			fd.close()
 
 		else:
+			global getstamproc
 			getstampproc = utillib.find_getstampproc()
+			if len(getstampproc):
+				msg = self.dumplogset()
+				f = open(outf,'a')
+				if not f.write(msg):
+					utillib.fatal('disk full')
+			else:
+				utillib.warning('could not figure out the log format of '+envir.HA_LOG)
 
 
-
-
+	def collect_for_nodes(nodes):
+		'''
+		Start slave collectors
+		nodes is list
+		'''
+		for n in node:
+			if node_need_pwd(n):
+				utillib.info('Please provide password for '+utillib.say_ssh_user+' at '+n)
+				utiilib.info('Note that collecting data will take a while.')
 
 
 	def get_pe_state_dir(self):
