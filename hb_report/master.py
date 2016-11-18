@@ -198,7 +198,7 @@ class master(node):
 		'''
 		Send envir.xml to slave node
 		'''
-#		utillib.creat_xml()
+
 	
 	def get_user_node_cts(self,ctslog):
 		#TODO

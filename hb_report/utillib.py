@@ -404,23 +404,41 @@ def parse_xml():
 	root = ET.parse('envir.xml').getroot()
 
 	for t in root:
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
-		if t.tag == 'DEST'
+		if t.tag == 'DEST':
+			envir.DEST = t.text
+		if t.tag == 'FROM_TIME':
+			envir.FROM_TIME = int(t.text )
+		if t.tag == 'TO_TIME':
+			envir.TO_TIME = int(t.text)
+		if t.tag == 'USER_NODES':
+			envir.USER_NODES = t.text.split('$')
+		if t.tag == 'HA_LOG':
+			envir.HA_LOG = t.text
+		if t.tag == 'UNIQUE_MSG':
+			envir.UNIQUE_MSG = t.text
+		if t.tag == 'SANITIZE':
+			envir.SANITIZE = t.text.split('$')
+		if t.tag == 'DO_SANITIZE':
+			envir.DO_SANIZITE = t.text
+		if t.tag == 'SKIP_LVL':
+			envir.SKIP_LVL = int(t.text)
+		if t.tag == 'EXTRA_LOGS':
+			envir.EXTRA_LOGS = t.text.split('$')
+		if t.tag == 'PCMK_LOG':
+			envir.PCMK_LOG = t.text
+		if t.tag == 'USER_CLUSTER_TYPE':
+			envir.USER_CLUSTER_TYPE = t.text
+		if t.tag == 'CONF':
+			envir.CONF = t.text
+		if t.tag == 'B_CONF':
+			envir.B_CONF = t.text
+		if t.tag == 'PACKAGES':
+			envir.PACKAGES = t.text.split('$')
+			print envir.PACKAGES
+		if t.tag == 'CORE_DIRS':
+			envir.CORE_DIRS = t.text.split('$')
+		if t.tag == 'VERBOSITY':
+			envir.VERBOSITY = t.text
 #		print t.tag,t.text
 
 
