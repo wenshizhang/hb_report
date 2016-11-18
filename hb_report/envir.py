@@ -110,3 +110,5 @@ HA_CF = ''
 HA_VARLIB = ''
 HA_DIR = ''
 
+#send env
+CRM_PATH = '/root/crmsh/crmsh/hb_report'

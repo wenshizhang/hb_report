@@ -16,6 +16,7 @@ from crmsh	import logtime
 from crmsh	import utils
 from crmsh	import logparser
 from node	import node
+from multiprocessing import Process
 
 class master(node):
 	SUDO = ''
@@ -194,12 +195,20 @@ class master(node):
 	def final_word(self):
 		pass
 
-	def send_env(self):
+	def send_env(self,nodes):
 		'''
 		Send envir.xml to slave node
 		'''
+		if not utillib.do_which('scp'):
+			utillib.fatal('Cannot find scp, does it is intalled?')
 
-	
+		command = 'scp envir.xml root@'+nodes+':'+envir.CRM_PATH
+
+		ret = os.system(command)
+		if ret:
+			utillib.fatal('scp envitonment file failed, please check cluster node can ssh or not')
+
+
 	def get_user_node_cts(self,ctslog):
 		#TODO
 		print 'This need to get cts user nodes'
@@ -376,6 +385,12 @@ def run():
 	
 	#create xml before collect
 	utillib.creat_xml()
+	
+	#then scp the file to collector
+	print envir.USER_NODES
+#	p = Process(target=mtr.send_env)
+#	p.start()
+
 	if not envir.NO_SSH:
 		mtr.collect_for_nodes(envir.USER_NODES)
 	elif is_node:
