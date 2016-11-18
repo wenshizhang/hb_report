@@ -7,6 +7,9 @@ import envir
 import time
 import StringIO
 
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
+
 from crmsh	import utils
 
 
@@ -360,6 +363,66 @@ def finf_getstampproc():
 
 	#TODO
 	pass
+
+def creat_xml():
+
+	root = ET.Element('root')
+
+	ET.SubElement(root,'DEST').text = envir.DEST
+	ET.SubElement(root,'FROM_TIME').text = str(int(envir.FROM_TIME))
+	ET.SubElement(root,'TO_TIME').text = str(int(envir.TO_TIME))
+	ET.SubElement(root,'USER_NODES').text = '$'.join(envir.USER_NODES)
+	ET.SubElement(root,'HA_LOG').text = envir.HA_LOG
+	ET.SubElement(root,'UNIQUE_MSG').text = envir.UNIQUE_MSG
+	ET.SubElement(root,'SANITIZE').text = '$'.join(envir.SANITIZE)
+	ET.SubElement(root,'DO_SANITIZE').text = envir.DO_SANITIZE
+	ET.SubElement(root,'SKIP_LVL').text = str(envir.SKIP_LVL)
+	ET.SubElement(root,'EXTRA_LOGS').text = '$'.join(envir.EXTRA_LOGS)
+	ET.SubElement(root,'PCMK_LOG').text = envir.PCMK_LOG
+	ET.SubElement(root,'USER_CLUSTER_TYPE').text = envir.USER_CLUSTER_TYPE
+	ET.SubElement(root,'CONF').text = envir.CONF
+	ET.SubElement(root,'B_CONF').text = envir.B_CONF
+	ET.SubElement(root,'PACKAGES').text = '$'.join(envir.PACKAGES)
+	ET.SubElement(root,'CORE_DIRS').text = '$'.join(envir.CORE_DIRS)
+	ET.SubElement(root,'VERBOSITY').text = envir.VERBOSITY
+
+
+	tree = ET.tostring(root,'UTF-8')
+	tree = minidom.parseString(tree).toprettyxml(indent="\t")
+
+	f = open('envir.xml','w')
+	f.write(tree)
+	f.close()
+
+#	tree = ET.ElementTree(root)
+#	tree.write('envir.xml')
+
+def parse_xml():
+	'''
+	Parse envir.xml file
+	'''
+	root = ET.parse('envir.xml').getroot()
+
+	for t in root:
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+		if t.tag == 'DEST'
+#		print t.tag,t.text
+
 
 
 

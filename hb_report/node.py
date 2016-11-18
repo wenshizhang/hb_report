@@ -17,6 +17,7 @@ import	subprocess
 
 from StringIO import StringIO
 from crmsh import config
+from multiprocessing import Process
 
 class node:
 	SSH_PASSWD = ''
@@ -125,6 +126,7 @@ class node:
 
 	def dumplogset():
 		#TODO
+		pass
 	
 	def getlog(self):
 		'''
@@ -159,7 +161,7 @@ class node:
 			utillib.warning("please check the time you input")
 		elif len(envir.CTS):
 			#argvment is envir.CTS and envir.HA_LOG
-			msg = cts_findlogmseg()
+			msg = self.cts_findlogseg()
 
 			fd = open(outf,"a")
 			fd.write(msg)
@@ -176,16 +178,25 @@ class node:
 			else:
 				utillib.warning('could not figure out the log format of '+envir.HA_LOG)
 
+	def start_slave_collector(self,node):
+		self.send_env()
 
-	def collect_for_nodes(nodes):
+
+	def node_need_pwd(self,nodes):
+		pass
+
+	def collect_for_nodes(self,nodes):
 		'''
 		Start slave collectors
 		nodes is list
 		'''
-		for n in node:
-			if node_need_pwd(n):
+		for n in nodes:
+			if self.node_need_pwd(n):
 				utillib.info('Please provide password for '+utillib.say_ssh_user+' at '+n)
 				utiilib.info('Note that collecting data will take a while.')
+			
+			p = Process(target=self.start_slave_collector,args=(n,))
+			p.start()
 
 
 	def get_pe_state_dir(self):

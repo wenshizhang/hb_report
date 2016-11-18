@@ -166,10 +166,11 @@ class master(node):
 			envir.SSH_USER.append("root")
 			envir.SSH_USER.append("hacluster")
 
-	def cts_findlogseg():
+	def cts_findlogseg(self):
 		'''
 		'''
 		#TODO
+		return 'test message'
 		utillib.debug('This is cts find log function, need to be finished later!:)')
 	def is_node(self):
 		pass
@@ -177,18 +178,9 @@ class master(node):
 	def find_ssh_user(self):
 		pass
 
-	def find_sudo(self):
-		pass
-
 	def change_to_timestamp(self,time):
 		ds = utils.parse_to_timestamp(time)
 		return ds
-
-	def collect_for_nodes(self):
-		pass
-
-	def start_collect(self):
-		pass
 
 	def analyzed(self):
 		pass
@@ -202,8 +194,11 @@ class master(node):
 	def final_word(self):
 		pass
 
-	def send_envir(self):
-		pass
+	def send_env(self):
+		'''
+		Send envir.xml to slave node
+		'''
+#		utillib.creat_xml()
 	
 	def get_user_node_cts(self,ctslog):
 		#TODO
@@ -378,6 +373,13 @@ def run():
 #
 	if THIS_IS_NODE:
 		mtr.getlog()
+	
+	#create xml before collect
+	utillib.creat_xml()
+	if not envir.NO_SSH:
+		mtr.collect_for_nodes(envir.USER_NODES)
+	elif is_node:
+		mtr.collecct_for_nodes([mtr.WE])
 		
 #try:
 run()
