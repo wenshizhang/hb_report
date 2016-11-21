@@ -7,10 +7,10 @@ import	socket
 import	utillib
 import	corosync_conf_support
 
-from	node import	node
+from node import node
+
 
 class collector(node):
-
 
 	def debug_info(self):
 		if(envir.VERBOSITY > 1):
@@ -25,8 +25,6 @@ class collector(node):
 	def get_envir(self):
 		pass
 	
-	def __init__(self):
-		pass
 
 
 def run():
@@ -48,6 +46,7 @@ def run():
 		ha_cf_support.get_log_var()
 
 	utillib.parse_xml()
+
 
 run()
 

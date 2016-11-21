@@ -11,6 +11,7 @@ import	utillib
 import	corosync_conf_support
 import	ha_cf_support
 import	subprocess
+import	collector
 
 from crmsh	import logtime
 from crmsh	import utils
@@ -185,6 +186,23 @@ class master(node):
 
 	def analyzed(self):
 		pass
+	
+	def start_slave_collector(self,nodes):
+
+		utillib.debug('running class collector function run to collect log on '+nodes)
+		if nodes == self.WE:
+			collector.run()
+		else:
+#			command = ['ssh']
+#			command.extend(envir.SSH_OPTS)
+#			command.append(nodes)
+#			command.append()
+
+			command = 'ssh '+ ' '.join(envir.SSH_OPTS)
+			
+			
+#			ret = subprocess.call(command)
+
 
 	def events(self):
 		pass
@@ -201,12 +219,13 @@ class master(node):
 		'''
 		if not utillib.do_which('scp'):
 			utillib.fatal('Cannot find scp, does it is intalled?')
+		if nodes != self.WE:
+			command = 'scp envir.xml root@'+nodes+':/tmp &>/dev/null'
+#			command = 'scp envir.xml root@'+nodes+':/tmp '
 
-		command = 'scp envir.xml root@'+nodes+':'+envir.CRM_PATH
-
-		ret = os.system(command)
-		if ret:
-			utillib.fatal('scp envitonment file failed, please check cluster node can ssh or not')
+			ret = os.system(command)
+			if ret:
+				utillib.fatal(nodes+' :scp envitonment file failed, please check cluster node can ssh or not')
 
 
 	def get_user_node_cts(self,ctslog):
@@ -217,7 +236,6 @@ class master(node):
 	def get_cts_log(self):
 		ctslog = utillib.findmsg('CTS: Stack:')
 		debug_msg = 'Using CTS control file :'+ctslog
-#		utillib.debug('Using CTS control file :'+ctslog)
 		utillib.debug(debug_msg)
 		#TODO
 #		envir.USER_NODES = self.get_user_node_cts(ctslog)
@@ -246,15 +264,14 @@ class master(node):
 	def testsshconn(self,user):
 		ret = 1
 		opts = envir.SSH_OPTS
-		opts.append('-T')
-		opts.append('-o Batchmode=yes')
-		opts.append(user)
-		opts.append('true')
+		
 		command = ['ssh']
 		command.extend(opts)
-#		print command
+		command.append('-T')
+		command.append('-o Batchmode=yes')
+		command.append(user)
+		command.append('true')
 
-#		print envir.SSH_OPTS+' -T -o Batchmode=yes '+user+' true'
 		ret = subprocess.call(command)
 		if not ret:
 			return True
@@ -316,6 +333,9 @@ def run():
 	'''
 	This method do most of the job that master node should do
 	'''
+
+
+	utillib.check_user()
 	utillib.setvarsanddefaults()
 	utillib.get_ocf_directories()
 
@@ -387,9 +407,10 @@ def run():
 	utillib.creat_xml()
 	
 	#then scp the file to collector
-	print envir.USER_NODES
-#	p = Process(target=mtr.send_env)
-#	p.start()
+	for n in envir.USER_NODES:
+
+		p = Process(target=mtr.send_env,args=(n,))
+		p.start()
 
 	if not envir.NO_SSH:
 		mtr.collect_for_nodes(envir.USER_NODES)
@@ -402,4 +423,3 @@ run()
 #	print 'Get an Error',msg
 #	if os.geteuid():
 #		print 'Please use root'
-

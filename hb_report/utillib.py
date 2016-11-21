@@ -401,7 +401,7 @@ def parse_xml():
 	'''
 	Parse envir.xml file
 	'''
-	root = ET.parse('envir.xml').getroot()
+	root = ET.parse('/tmp/envir.xml').getroot()
 
 	for t in root:
 		if t.tag == 'DEST':
@@ -434,13 +434,21 @@ def parse_xml():
 			envir.B_CONF = t.text
 		if t.tag == 'PACKAGES':
 			envir.PACKAGES = t.text.split('$')
-			print envir.PACKAGES
 		if t.tag == 'CORE_DIRS':
 			envir.CORE_DIRS = t.text.split('$')
 		if t.tag == 'VERBOSITY':
 			envir.VERBOSITY = t.text
 #		print t.tag,t.text
 
+def check_user():
+	'''
+	hb_report force user run as root
+	so run it, the user shoule be check
+	'''
+	euid = os.geteuid()
+	if euid:
+		fatal('Please run hb_report as root!')
+	
 
 
 

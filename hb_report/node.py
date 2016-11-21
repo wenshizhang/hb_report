@@ -26,7 +26,6 @@ class node:
 	THIS_IS_NODE = 0
 
 	def mktemp(self,dest=''):
-		print 'dest is',dest
 		tmpdir = tempfile.mkdtemp()
 		if len(dest):
 			path = os.path.join(tmpdir,dest)
@@ -177,9 +176,6 @@ class node:
 					utillib.fatal('disk full')
 			else:
 				utillib.warning('could not figure out the log format of '+envir.HA_LOG)
-
-	def start_slave_collector(self,node):
-		self.send_env()
 
 
 	def node_need_pwd(self,nodes):
