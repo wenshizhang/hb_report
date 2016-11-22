@@ -384,13 +384,15 @@ def creat_xml():
 	ET.SubElement(root,'B_CONF').text = envir.B_CONF
 	ET.SubElement(root,'PACKAGES').text = '$'.join(envir.PACKAGES)
 	ET.SubElement(root,'CORE_DIRS').text = '$'.join(envir.CORE_DIRS)
-	ET.SubElement(root,'VERBOSITY').text = envir.VERBOSITY
+	ET.SubElement(root,'VERBOSITY').text = str(envir.VERBOSITY)
 
 
 	tree = ET.tostring(root,'UTF-8')
 	tree = minidom.parseString(tree).toprettyxml(indent="\t")
 
-	f = open('envir.xml','w')
+	path = os.path.join(envir.XML_PATH,envir.XML_NAME)
+
+	f = open(path,'w')
 	f.write(tree)
 	f.close()
 
@@ -401,7 +403,8 @@ def parse_xml():
 	'''
 	Parse envir.xml file
 	'''
-	root = ET.parse('/tmp/envir.xml').getroot()
+	path= os.path.join(envir.XML_PATH,envir.XML_NAME)
+	root = ET.parse(path).getroot()
 
 	for t in root:
 		if t.tag == 'DEST':
@@ -437,8 +440,10 @@ def parse_xml():
 		if t.tag == 'CORE_DIRS':
 			envir.CORE_DIRS = t.text.split('$')
 		if t.tag == 'VERBOSITY':
-			envir.VERBOSITY = t.text
-#		print t.tag,t.text
+#			print t.text
+			envir.VERBOSITY = int(t.text)
+
+#		os.remove(path)
 
 def check_user():
 	'''

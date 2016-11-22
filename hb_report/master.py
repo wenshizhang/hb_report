@@ -12,6 +12,7 @@ import	corosync_conf_support
 import	ha_cf_support
 import	subprocess
 import	collector
+import	paramiko
 
 from crmsh	import logtime
 from crmsh	import utils
@@ -187,22 +188,24 @@ class master(node):
 	def analyzed(self):
 		pass
 	
-	def start_slave_collector(self,nodes):
+	def start_slave_collector(self,nodes,port=22,username='root'):
 
 		utillib.debug('running class collector function run to collect log on '+nodes)
 		if nodes == self.WE:
 			collector.run()
 		else:
-#			command = ['ssh']
-#			command.extend(envir.SSH_OPTS)
-#			command.append(nodes)
-#			command.append()
+			paramiko.util.log_to_file('/tmp/paramiko.log')
+			client = paramiko.SSHClient()
+			client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+			client.connect(nodes,port,username)
 
-			command = 'ssh '+ ' '.join(envir.SSH_OPTS)
-			
-			
-#			ret = subprocess.call(command)
-
+			#TODO
+			#need to finish the hb_report path
+			path = os.path.join(envir.CRM_PATH,'collector.py')
+			utillib.debug(nodes+' collector script path :'+path)
+			stdin,stdout,stderr = client.exec_command('hb_report __slave')
+			print nodes,' output :',stdout.read()
+			utillib.debug(nodes+' collect log is done')
 
 	def events(self):
 		pass
@@ -220,13 +223,10 @@ class master(node):
 		if not utillib.do_which('scp'):
 			utillib.fatal('Cannot find scp, does it is intalled?')
 		if nodes != self.WE:
-			command = 'scp envir.xml root@'+nodes+':/tmp &>/dev/null'
-#			command = 'scp envir.xml root@'+nodes+':/tmp '
-
+			command = 'scp '+os.path.join(envir.XML_PATH,envir.XML_NAME)+' root@'+nodes+':/tmp &>/dev/null'
 			ret = os.system(command)
 			if ret:
 				utillib.fatal(nodes+' :scp envitonment file failed, please check cluster node can ssh or not')
-
 
 	def get_user_node_cts(self,ctslog):
 		#TODO
@@ -341,7 +341,7 @@ def run():
 
 	mtr = master()
 	mtr.analyzed_argvment(sys.argv)
-	
+
 	#who am i
 	mtr.WE= socket.gethostname()
 	
@@ -416,9 +416,9 @@ def run():
 		mtr.collect_for_nodes(envir.USER_NODES)
 	elif is_node:
 		mtr.collecct_for_nodes([mtr.WE])
-		
+
 #try:
-run()
+#run()
 #except OSError as msg:
 #	print 'Get an Error',msg
 #	if os.geteuid():

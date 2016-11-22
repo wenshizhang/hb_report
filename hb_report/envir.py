@@ -111,4 +111,6 @@ HA_VARLIB = ''
 HA_DIR = ''
 
 #send env
-CRM_PATH = '/root/crmsh/crmsh/hb_report'
+CRM_PATH = '/usr/hb_report'
+XML_NAME = 'envirver.xml'
+XML_PATH = '/tmp'

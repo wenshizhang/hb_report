@@ -44,9 +44,8 @@ def run():
 		utillib.debug('log setting :facility = '+envir.HA_LOGFACILITY+' logfile = '+envir.HA_LOGFILE+' debug file = '+envir.HA_DEBUGFILE)
 	else:
 		ha_cf_support.get_log_var()
-
+	
 	utillib.parse_xml()
 
-
-run()
+#run()
 
