@@ -16,11 +16,11 @@ if v_min > v_this:
 try:
     try:
 		if sys.argv[1] == '__slave':
-			from hb_report import collector
-			collector.run()
-		else:
-			from hb_report import master
-			master.run()
+			import collector
+			collector.run(0)
+#		else:
+#			from hb_report import master
+#			master.run()
 
     except ImportError as msg:
         sys.stderr.write('''Fatal error:
