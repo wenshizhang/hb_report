@@ -509,12 +509,12 @@ def do_command(argv):
 	call subprocess do 
 	'''
 	command = argv[0]
+	comm_list = argv
+
 	if not do_which(command):
 		debug(command+' is not found')
 		msg = command+' : command not found'
 		return msg
-	comm_list = command.split()
-	comm_list.extend(argv)
 
 	com_pro = subprocess.Popen(comm_list,stdout = subprocess.PIPE,stderr = subprocess.STDOUT)
 

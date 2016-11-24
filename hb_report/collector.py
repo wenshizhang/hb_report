@@ -65,8 +65,54 @@ class collector(node):
 
 	def sys_stats(self):
 		
-		f = open(os.path.join(self.WORKDIR,envir.SYSSTATS_F),'w')
 		msg = ''
+
+		f = open(os.path.join(self.WORKDIR,envir.SYSSTATS_F),'w')
+
+		msg = msg + self.WE+'\n'
+
+		uptime = utillib.do_command(['uptime'])
+		msg = msg+uptime
+
+		ps_info = utillib.do_command(['ps','axf'])
+		msg = msg+ps_info
+	
+		ps_info = utillib.do_command(['ps','auxw'])
+		msg = msg + ps_info
+
+		top_info = utillib.do_command(['top','-b','-n','1'])
+		msg = msg + top_info
+
+		ip_info = utillib.do_command(['ip','addr'])
+		msg = msg+'\n'+ip_info
+
+		net_info = utillib.do_command(['netstat','-i'])
+		msg = msg +'\n'+net_info
+
+		arp_info = utillib.do_command(['arp','-an'])
+		msg = msg + '\n' + arp_info
+
+		if os.path.isdir('/proc'):
+			cpu_f =open('/proc/cpuinfo','r')
+			cpu_info = cpu_f.readline()
+			while len(cpu_info):
+				msg = msg + cpu_info
+				cpu_info = cpu_f.readline()
+
+		scsi_info = utillib.do_command(['lsscsi'])
+		msg = msg +'\n'+ scsi_info
+
+		pci_info = utillib.do_command(['lspci'])
+		msg = msg +'\n'+ pci_info
+
+		mount_info = utillib.do_command(['mount'])
+		msg = msg +'\n' + mount_info
+
+		#df can block, run in background, allow for 5 seconds
+
+
+		print msg
+
 
 	def getconfig(self):
 		pass
