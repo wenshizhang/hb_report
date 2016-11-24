@@ -2,6 +2,7 @@ import os
 import sys
 import envir
 import utillib
+import subprocess
 
 
 def getcfvar(param):
@@ -70,4 +71,36 @@ def uselogd():
 		return True
 
 	return False
+
+def cluster_info():
+	if envir.CONF == '/etc/corosync/corosync.conf':
+		coro_pro = subprocess.Popen(['/usr/sbin/corosync','-v'],stdout = subprocess.PIPE,stderr=subprocess.STDOUT)
+		output = coro_pro.communicate()[0]
+		return output
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

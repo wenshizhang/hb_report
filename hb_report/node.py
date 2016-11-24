@@ -348,10 +348,15 @@ class node:
 				utillib.debug('reading log settings from '+envir.LOGD_CF)
 				corosync.get_logd_logvars()
 
-	def high_debug_level1(self):
-		pass
-
-
+	def import_support(self):
+		global support
+		if envir.USER_CLUSTER_TYPE == 'corosync':
+			#import corosync_conf_support as support
+			return "corosync_conf_support"
+		else:
+			return "ha_conf_support"
+			#import ha_conf_support as support
+			
 	def conf(self):
 		pass
 

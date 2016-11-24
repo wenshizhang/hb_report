@@ -6,6 +6,7 @@ import re
 import envir
 import time
 import StringIO
+import subprocess
 
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
@@ -330,6 +331,27 @@ def do_greple(dirs,form):
 		
 	return log
 
+def do_grep_file(files,form):
+	'''
+	In dirs directoriy find file text  match form
+	Like grep -l -e, return the match name when get the first match 
+	'''
+	log = ''
+		
+	if not os.path.isfile(files):
+		fatal(files+' is not exits')
+
+	fd = open(files,'r')
+	txt = fd.readline()
+	#hit the targrt
+	while txt:
+		if txt.find(form) != -1:
+			return txt
+		txt = fd.readline()
+	fd.close()
+
+	return ''
+		
 
 def findmsg():
 	'''
@@ -387,6 +409,7 @@ def creat_xml():
 	ET.SubElement(root,'VERBOSITY').text = str(envir.VERBOSITY)
 	ET.SubElement(root,'XML_PATH').text = str(envir.XML_PATH)
 	ET.SubElement(root,'XML_NAME').text = str(envir.XML_NAME)
+	ET.SubElement(root,'HA_BIN').text = str(envir.HA_BIN)
 
 
 
@@ -448,6 +471,8 @@ def parse_xml():
 			envir.XML_NAME = t.text
 		if t.tag == 'XML_PATH':
 			envir.XML_PATH = t.text
+		if t.tag == 'HA_BIN':
+			envir.HA_BIN = t.text
 
 #		os.remove(path)
 
@@ -470,6 +495,136 @@ def do_rm(nodes,filepath):
 	os.remove(filepath)
 	debug(nodes+' remove file :'+filepath)
 	return True
+
+def crm_info():
+	'''
+	Get crmd version
+	'''
+	crm_pro = subprocess.Popen([envir.CRM_DAEMON_DIR+'/crmd','version'],stdout = subprocess.PIPE,stderr = subprocess.STDOUT)
+	return crm_pro.communicate()[0]
+
+
+def do_command(argv):
+	'''
+	call subprocess do 
+	'''
+	command = argv[0]
+	if not do_which(command):
+		debug(command+' is not found')
+		msg = command+' : command not found'
+		return msg
+	comm_list = command.split()
+	comm_list.extend(argv)
+
+	com_pro = subprocess.Popen(comm_list,stdout = subprocess.PIPE,stderr = subprocess.STDOUT)
+
+	msg = com_pro.communicate()[0]
+	return msg
+
+def pkg_ver_deb():
+	argv = ['dpkg-query','-f',"${Name} ${Version}",'-W']
+	argv.extend(emvir.PACKAGES)
+
+	msg = do_command(argv)
+
+	return msg
+
+def pkg_ver_pkg_info():
+	#TODO
+	pass
+def pkg_ver_pkginfo():
+	#TODO
+	pass
+
+def pkg_ver_rpm():
+	argv = ['rpm','-q','--qf',"%{name} %{version}-%{release} - %{distribution} %{arch}\n"]
+	argv.extend(envir.PACKAGES)
+
+	rpm_pro = subprocess.Popen(argv,stdout = subprocess.PIPE,stderr = subprocess.STDOUT)
+	grep_pro = subprocess.Popen(['grep','-v',"not installed"],stdin = rpm_pro.stdout,stdout = subprocess.PIPE)
+
+	pkg_info = grep_pro.communicate()[0]
+
+	return pkg_info
+
+def pkg_version():
+
+	pkg_mgr = get_pkg_mgr()
+
+	if not len(pkg_mgr):
+		debug('pkg_mgr not found')
+		return
+
+	debug('the package manager is '+pkg_mgr)
+
+	func = globals()['pkg_ver_'+pkg_mgr]
+	pkg_info = func()
+
+	return pkg_info
+
+def get_pkg_mgr():
+	
+	if do_which('dpkg'):
+		pkg_mgr = 'deb'
+	elif do_which('rpm'):
+		pkg_mgr = 'rpm'
+	elif do_which('pkg_info'):
+		pkg_mgr = 'pkg_info'
+	elif do_which('pkginfo'):
+		pkg_mgr ='pkginfo'
+	else:
+		warning('Unknown package manager!')
+		return
+
+	return pkg_mgr
+
+def verify_rpm():
+
+	argv = ['rpm','--verify']
+	argv.extend(envir.PACKAGES)
+
+	rpm_pro = subprocess.Popen(argv,stdout = subprocess.PIPE,stderr = subprocess.STDOUT)
+#	rpm_pro.wait()
+	grep_pro = subprocess.Popen(['grep','-v',"not installed"],stdin = rpm_pro.stdout,stdout = subprocess.PIPE,stderr = subprocess.STDOUT)
+
+#	rpm_msg = grep_pro.communicate()[0]
+	rpm_msg = rpm_pro.communicate()[0]
+	return rpm_msg
+
+def verify_deb():
+	
+	argv = ['debsums','-s']
+	argv.extend(envir.PACKAGES)
+
+	deb_info = do_command(argv)
+
+	return deb_info
+
+def verify_pkg_info:
+	'''
+	Do not need to get
+	'''
+	pass
+def verify_pkginfo:
+	'''
+	Do not need to get
+	'''
+	pass
+
+def verify_packages():
+
+	pkg_mgr = get_pkg_mgr()
+
+	if not len(pkg_mgr):
+		return
+	func = globals()['verify_'+pkg_mgr]
+	func()
+
+
+
+
+
+
 
 
 
