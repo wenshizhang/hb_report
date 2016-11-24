@@ -587,8 +587,7 @@ def verify_rpm():
 #	rpm_pro.wait()
 	grep_pro = subprocess.Popen(['grep','-v',"not installed"],stdin = rpm_pro.stdout,stdout = subprocess.PIPE,stderr = subprocess.STDOUT)
 
-#	rpm_msg = grep_pro.communicate()[0]
-	rpm_msg = rpm_pro.communicate()[0]
+	rpm_msg = grep_pro.communicate()[0]
 	return rpm_msg
 
 def verify_deb():
@@ -600,12 +599,13 @@ def verify_deb():
 
 	return deb_info
 
-def verify_pkg_info:
+def verify_pkg_info():
 	'''
 	Do not need to get
 	'''
 	pass
-def verify_pkginfo:
+
+def verify_pkginfo():
 	'''
 	Do not need to get
 	'''
@@ -618,9 +618,33 @@ def verify_packages():
 	if not len(pkg_mgr):
 		return
 	func = globals()['verify_'+pkg_mgr]
-	func()
+	vrf_info = func()
 
+	return vrf_info
 
+def distro():
+	distro_msg = do_command(['lsb_release','-d'])
+
+	if len(distro_msg):
+		debug('using lsb_release for distribution info')
+		return distro_msg
+
+	if os.path.isdir('/etc/debain_version/'):
+		relf = do_command(['ls','/etc/debain_version/'])
+	elif os.path.isdir('/etc/slackware-version'):
+		relf = do_command(['ls','/etc/slackware-version'])
+	else:
+		relf = do_command(['ls','-d','/etc/*-release'])
+	
+	if len(relf):
+		for f in relf.split():
+			msg = do_command(['ls',f])
+			msg = msg + do_command(['cat',f])
+			return msg
+	
+	warning('no lsb_release, no /etc/*-release, no /etc/debain_version: no distro information')
+
+	
 
 
 

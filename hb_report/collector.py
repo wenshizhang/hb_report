@@ -6,6 +6,7 @@ import	sys
 import	socket
 import	utillib
 import subprocess
+import platform
 
 from node import node
 
@@ -19,34 +20,53 @@ class collector(node):
 		'''
 		create file WORKDIR/sysinfo.txt
 		'''
+		msg = ''
+		print 'WORKDIR IS',self.WORKDIR
 		f = open(filename,'w')
 		support = __import__(self.import_support())
 		cluster_version = support.cluster_info()
-		f.write(cluster_version)
+		msg = cluster_version
 
 		hbrp_ver = utillib.do_command([envir.HA_NOARCHBIN+'/hb_report','-V'])
-		f.write(hbrp_ver)
+		msg = msg+hbrp_ver
 
 		rsag_ver = utillib.do_grep_file('/usr/lib/ocf/lib/heartbeat/ocf-shellfuncs','Build version:')
 		rsag_ver = 'resource-agents: '+rsag_ver
-		f.write(rsag_ver)
+		msg = msg + rsag_ver
 
 		crm_version = utillib.crm_info()
-		f.write(crm_version)
+		msg = msg+crm_version
 
 		booth_info = utillib.do_command(['booth','--version'])
-		f.write(booth_info)
+		msg = msg+booth_info
 		
 		pkg_info = utillib.pkg_version()
+		msg = msg + pkg_info
 		f.write(pkg_info)
 		
-		print envir.SKIP_LVL
 		if envir.SKIP_LVL >= 1:
-			utillib.verify_packages()
+			vrf_info = utillib.verify_packages()
+			msg = msg + vrf_info
 
+		sys_name = 'Platform: '+ platform.system()+'\n'
+		msg = msg+sys_name
+
+		knl_name = 'Kernel release: '+platform.release()+'\n'
+		msg = msg+knl_name
+		
+		arch_name = 'Architecture: '+platform.machine()+'\n'
+		msg = msg+arch_name
+
+		if platform.system() == 'Linux':
+			dist_name = utillib.distro()+'\n'
+			msg = msg + dist_name
+		f.write(msg)
+		f.close()
 
 	def sys_stats(self):
-		pass
+		
+		f = open(os.path.join(self.WORKDIR,envir.SYSSTATS_F),'w')
+		msg = ''
 
 	def getconfig(self):
 		pass
