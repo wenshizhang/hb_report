@@ -9,6 +9,7 @@ import	subprocess
 import	platform
 import	threading
 import	shutil
+import	tempfile
 
 from node import node
 
@@ -123,13 +124,15 @@ class collector(node):
 		f.write(msg)
 		f.close()
 
-	def getconfig(self):
-		pass
+	def getpeinputs(self,workdir):
+		utillib.debug('looking for PE files in'+envir.PE_STATE_DIR)
+		flist = utillib.find_files()
 
 	def collect_info(self):
 		self.sys_info(os.path.join(self.WORKDIR,envir.SYSINFO_F))
 		self.sys_stats()
 		utillib.getconfig(self.WORKDIR)
+		self.getpeinputs(self.WORKDIR)
 
 	def return_result(self):
 		pass
@@ -141,6 +144,9 @@ def run(master_flag):
 	#if this is master node, then flag THIS_IS_NDOE is 1, else case it is 0
 	sla.THIS_IS_NODE = master_flag
 	
+	#init_tempfiles
+	envir.__TMPFLIST = tempfile.mkstemp()[1]
+
 	#who am i
 	sla.WE = socket.gethostname()
 

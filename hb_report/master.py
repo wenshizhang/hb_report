@@ -11,6 +11,7 @@ import	utillib
 import	subprocess
 import	collector
 import	paramiko
+import	tempfile
 
 from crmsh	import logtime
 from crmsh	import utils
@@ -332,12 +333,14 @@ def run():
 	This method do most of the job that master node should do
 	'''
 
-
+	
 	utillib.check_user()
 	utillib.setvarsanddefaults()
 	utillib.get_ocf_directories()
 
 	mtr = master()
+	envir.__TMPFLIST = tempfile.mkstemp()[1]
+	print '__TMPFLIST is',envir.__TMPFLIST
 	mtr.analyzed_argvment(sys.argv)
 
 	#who am i
@@ -413,7 +416,6 @@ def run():
 		mtr.collect_for_nodes(envir.USER_NODES)
 	elif is_node:
 		mtr.collecct_for_nodes([mtr.WE])
-
 
 #try:
 run()

@@ -8,6 +8,7 @@ import time
 import StringIO
 import subprocess
 import shutil
+import tempfile
 
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
@@ -689,7 +690,71 @@ def getconfig(workdir):
 
 	if iscrmrunning():
 		dumpstate(workdir)
+		writefile(os.path.join(workdir,'RUNNING'),'')
+	else:
+		shutil.copyfile(os.path.join(envir.CIB_DIR,envir.CIB_F),os.path.join(workdir,envir.CIB_F))
+		writefile(os.path.join(workdir,'STOPPED'),'')
 
+	if len(envir.HOSTCACHE):
+		if os.path.isfile(os.path.join(envir.HA_VARLIB,'hostcache')):
+			shutil.copyfile(os.path.join(envir.HA_VARLIB,'hostcache'),os.path.join(workdir,envir.HOSTCACHE))
+
+	if len(envir.HB_UUID_F):
+		crm_uuid_info = do_command(['crm_uuid','-r'])
+		writefile(os.path.join(workdir,envir.HB_UUID_F),crm_uuid_info)
+
+	if os.path.isfile(os.path.join(workdir,envir.CIB_F)):
+		verify_info = do_command(['crm_verify','-V','-x',os.path.join(workdir,envir.CIB_F)])
+		writefile(os.path.join(workdir,envir.CRM_VERIFY_F),verify_info)
+
+def touchfile(time):
+	tmp = tempfile.mkstemp()[1]
+	os.utime(tmp,(time,time))
+
+	return tmp
+
+def add_tmpfiles(files):
+	
+	if not os.path.isfile(envir.__TMPFLIST):
+		return
+	f = open(envir.__TMPFLIST,'a')
+	f.write(files)
+	f.close
+
+
+def find_files():
+	dirs = envir.PE_STATE_DIR
+
+	from_time = envir.FROM_TIME
+	to_time = envir.TO_TIME
+
+	if from_time <= 0:
+		warning('sorry, can\'t find files based on time if you don\'t supply time')
+		return
+	from_stamp = touchfile(from_time)
+
+	if not len(from_stamp):
+		warning("Can't create temporary files")
+		return
+	add_tmpfiles(from_stamp)
+	findexp = '-newer '+from_stamp
+
+	if to_time > 0:
+		to_stamp = touchfile(to_time)
+		
+		if not len(to_stamp):
+			warning("Can't create temporary files")
+			return
+		add_tmpfiles(to_stamp)
+
+		findexp = findexp + ' ! -newer '+to_stamp
+		command = ['find',dirs,'-type','f']
+
+		command.extend(findexp.split())
+		msg = do_command(command)
+
+		return msg
+		
 
 
 

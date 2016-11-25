@@ -114,3 +114,6 @@ HA_DIR = ''
 CRM_PATH = '/usr/hb_report'
 XML_NAME = 'envirver.xml'
 XML_PATH = '/tmp'
+
+#other stuff
+__TMPFLIST = ''
