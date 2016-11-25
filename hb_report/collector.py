@@ -5,8 +5,10 @@ import	envir
 import	sys
 import	socket
 import	utillib
-import subprocess
-import platform
+import	subprocess
+import	platform
+import	threading
+import	shutil
 
 from node import node
 
@@ -109,10 +111,17 @@ class collector(node):
 		msg = msg +'\n' + mount_info
 
 		#df can block, run in background, allow for 5 seconds
+		df_pro = subprocess.Popen(['df'],stderr = subprocess.STDOUT,stdout = subprocess.PIPE)
+		timer = threading.Timer(5.0,df_pro.kill)
+		timer.start()
+		df_info = df_pro.communicate()[0]
+		if timer.is_alive():
+			#df exited naturally, cancel timer
+			timer.cancel()
+		msg = msg +'\n'+df_info
 
-
-		print msg
-
+		f.write(msg)
+		f.close()
 
 	def getconfig(self):
 		pass
@@ -120,6 +129,7 @@ class collector(node):
 	def collect_info(self):
 		self.sys_info(os.path.join(self.WORKDIR,envir.SYSINFO_F))
 		self.sys_stats()
+		utillib.getconfig(self.WORKDIR)
 
 	def return_result(self):
 		pass

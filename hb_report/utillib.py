@@ -7,6 +7,7 @@ import envir
 import time
 import StringIO
 import subprocess
+import shutil
 
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
@@ -644,7 +645,54 @@ def distro():
 	
 	warning('no lsb_release, no /etc/*-release, no /etc/debain_version: no distro information')
 
+def writefile(path,msg):
+	try:
+		f = open(path,'w')
+		f.write(msg)
+		f.close()
+	except IOError as msg:
+		fatal(msg)
+	except:
+		faral('Can not collect file :'+path+'on '+socket.gethostname())
+
+def get_membership_tool():
+
+	mem_tool = ['ccm_tool','crm_node']
+
+	for m in mem_tool:
+		if do_which(m):
+			return m
+
+def dumpstate(workdir):
+
+	crm_pro = subprocess.Popen(['crm_mon','-1'],stdout = subprocess.PIPE,stderr = subprocess.STDOUT)
+	grep_pro = subprocess.Popen(['grep','-v',"^Last upd"],stdin = crm_pro.stdout,stderr = subprocess.STDOUT,stdout = subprocess.PIPE)
+
+	crm_info = grep_pro.communicate()[0]
+
+	writefile(os.path.join(workdir,envir.CRM_MON_F),crm_info)
+
+	cib_info = do_command(['cibadmin','-Ql'])
+	writefile(os.path.join(workdir,envir.CIB_F),cib_info)
 	
+	mem_tool = get_membership_tool()
+	mbsp_info = do_command([mem_tool,envir.MEMBERSHIP_TOOL_OPTS,'-p'])
+	writefile(os.path.join(workdir,envir.MEMBERSHIP_F),mbsp_info)
+
+def getconfig(workdir):
+
+	if os.path.isfile(envir.CONF):
+		shutil.copyfile(envir.CONF,os.path.join(workdir,basename(envir.CONF)))
+	
+	if os.path.isfile(envir.LOGD_CF):
+		shutil.copyfile(envir.LOGD_CF,os.path.join(workdir,basename(envir.LOGD_CF)))
+
+	if iscrmrunning():
+		dumpstate(workdir)
+
+
+
+
 
 
 
