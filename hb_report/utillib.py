@@ -747,7 +747,8 @@ def find_files():
 			return
 		add_tmpfiles(to_stamp)
 
-		findexp = findexp + ' ! -newer '+to_stamp
+#		findexp = findexp + ' ! -newer '+to_stamp
+		findexp = ' ! -newer '+to_stamp
 		command = ['find',dirs,'-type','f']
 
 		command.extend(findexp.split())

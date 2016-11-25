@@ -127,6 +127,9 @@ class collector(node):
 	def getpeinputs(self,workdir):
 		utillib.debug('looking for PE files in'+envir.PE_STATE_DIR)
 		flist = utillib.find_files()
+		grep_pro = subprocess.Popen(['grep','-v',"[.]last$"],stdin = subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+		flist = grep_pro.communicate(flist)[0]
+
 
 	def collect_info(self):
 		self.sys_info(os.path.join(self.WORKDIR,envir.SYSINFO_F))
