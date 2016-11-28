@@ -90,7 +90,7 @@ COROSYNC_RECORDER_F='fdata.txt'
 CONFIGURATIONS=['/etc/drbd.conf','/etc/drbd.d','/etc/booth/booth.conf']
 
 #configure files
-CORE_DIRS = []
+CORES_DIRS = []
 PACKAGES = []
 CONF = ''
 CF_SUPPORT = ''
@@ -99,7 +99,7 @@ MEMBERSHIP_TOOL_OPTS = ''
 
 #daemon directories
 CRM_DAEMON_DIR = ''
-PE_STATE_DIR = ''
+PE_STATE_DIR = []
 CIB_DIR = ''
 PCMK_LIB = ''
 
@@ -117,3 +117,4 @@ XML_PATH = '/tmp'
 
 #other stuff
 __TMPFLIST = ''
+PTEST = ''

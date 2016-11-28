@@ -124,11 +124,67 @@ class collector(node):
 		f.write(msg)
 		f.close()
 
+	def pe2dot(self,path):
+		pef = utillib.basename(path)
+		if pef.endswith('.bz2'):
+			dotf = pef[0:len(pef)-4]
+
+		if not len(envir.PTEST):
+			return False
+		try:
+			msg = utillib.do_command([envir.PTEST,'-D','dotf','-x',pef])
+		except:
+			utillib.debug(envir.PTEST+' faild! ')
+			return
+
+
+
 	def getpeinputs(self,workdir):
+		i = 0
+
 		utillib.debug('looking for PE files in'+envir.PE_STATE_DIR)
-		flist = utillib.find_files()
+		flist = utillib.find_files(envir.PE_STATE_DIR.split())
 		grep_pro = subprocess.Popen(['grep','-v',"[.]last$"],stdin = subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-		flist = grep_pro.communicate(flist)[0]
+		flist = grep_pro.communicate(' '.join(flist))[0].split()
+		
+		if len(flist):
+			filename = utillib.basename(envir.PE_STATE_DIR)
+			pengine_dir = os.path.join(workdir,filename)
+			os.mkdir(pengine_dir)
+			for f in flist:
+				os.symlink(f,os.path.join(pengine_dir,utillib.basename(f)))
+				i = i + 1
+			utillib.debug('found '+str(i)+' pengine input files in '+envir.PE_STATE_DIR)
+
+		if i >= 20:
+			for f in flist:
+				if not self.skip_lvl(1):
+					path = os.path.join(workdir,utillib.basename(envir.PE_STATE_DIR))
+					path = os.path.join(path,utillib.basename(f))
+					self.pe2dot(path)
+		else:
+			utillib.debug('too many PE inputs to create dot files')
+
+	def touch_DC_if_dc(self):
+		dc = utillib.do_command(['crmadmin','-D'])
+		dc = dc.split()[len(dc.split()) - 1]
+		if self.WE == dc:
+			utillib.writefile(os.path.join(self.WORKDIR,'DC'),'')
+
+	def getbacktraces(self):
+		flist = []
+		bt_files = utillib.find_files(envir.CORES_DIRS)
+		for f in bt_files:
+			bf = utillib.basename(f)
+			bf_num  = utillib.do_command(['expr','match',bf,'core'])
+			if bf_num > 0:
+				flist.append(f)
+		if len(flist):
+			utillib.getbt(flist,os.path.join(self.WORKDIR,envir.BT_F))
+			utillib.debug('found basktraces: '+' '.join(flist))
+
+	def getconfigurations(self):
+		dest = self.WORKDIR
 
 
 	def collect_info(self):
@@ -136,6 +192,10 @@ class collector(node):
 		self.sys_stats()
 		utillib.getconfig(self.WORKDIR)
 		self.getpeinputs(self.WORKDIR)
+		utillib.crmconfig(self.WORKDIR)
+		if not self.skip_lvl(1):
+			self.touch_DC_if_dc()
+		self.getbacktraces()
 
 	def return_result(self):
 		pass

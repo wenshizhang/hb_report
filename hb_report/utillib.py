@@ -407,7 +407,7 @@ def creat_xml():
 	ET.SubElement(root,'CONF').text = envir.CONF
 	ET.SubElement(root,'B_CONF').text = envir.B_CONF
 	ET.SubElement(root,'PACKAGES').text = '$'.join(envir.PACKAGES)
-	ET.SubElement(root,'CORE_DIRS').text = '$'.join(envir.CORE_DIRS)
+	ET.SubElement(root,'CORES_DIRS').text = '$'.join(envir.CORES_DIRS)
 	ET.SubElement(root,'VERBOSITY').text = str(envir.VERBOSITY)
 	ET.SubElement(root,'XML_PATH').text = str(envir.XML_PATH)
 	ET.SubElement(root,'XML_NAME').text = str(envir.XML_NAME)
@@ -465,8 +465,8 @@ def parse_xml():
 			envir.B_CONF = t.text
 		if t.tag == 'PACKAGES':
 			envir.PACKAGES = t.text.split('$')
-		if t.tag == 'CORE_DIRS':
-			envir.CORE_DIRS = t.text.split('$')
+		if t.tag == 'CORES_DIRS':
+			envir.CORES_DIRS = t.text.split('$')
 		if t.tag == 'VERBOSITY':
 			envir.VERBOSITY = int(t.text)
 		if t.tag == 'XML_NAME':
@@ -525,7 +525,7 @@ def do_command(argv):
 
 def pkg_ver_deb():
 	argv = ['dpkg-query','-f',"${Name} ${Version}",'-W']
-	argv.extend(emvir.PACKAGES)
+	argv.extend(envir.PACKAGES)
 
 	msg = do_command(argv)
 
@@ -722,8 +722,7 @@ def add_tmpfiles(files):
 	f.close
 
 
-def find_files():
-	dirs = envir.PE_STATE_DIR
+def find_files(dirs):
 
 	from_time = envir.FROM_TIME
 	to_time = envir.TO_TIME
@@ -747,14 +746,36 @@ def find_files():
 			return
 		add_tmpfiles(to_stamp)
 
-#		findexp = findexp + ' ! -newer '+to_stamp
-		findexp = ' ! -newer '+to_stamp
-		command = ['find',dirs,'-type','f']
-
+		findexp = findexp + ' ! -newer '+to_stamp
+#		findexp = ' ! -newer '+to_stamp
+#		command = ['find',dirs,'-type','f']
+		command = ['find']
+		command.extend(dirs)
+		command.append('-type')
+		command.append('f')
 		command.extend(findexp.split())
 		msg = do_command(command)
 
-		return msg
+		return msg.split('\n')
+
+def crmconfig(workdir):
+
+	if os.path.isfile(os.path.join(workdir,envir.CIB_F)):
+		if do_which('crm'):
+			CIB_file = os.path.join(workdir,envir.CIB_F)
+			cibconfig_info = do_command(['crm','configure','show'])
+			writefile(os.path.join(workdir,envir.CIB_TXT_F),cibconfig_info)
+
+def getbt(flist,output):
+	corefile = ''
+
+	if not do_which('gdb'):
+		warning('please install gdb to get backtraces')
+		return
+	#TODO
+	#utillib.sh getbt
+		
+
 		
 
 

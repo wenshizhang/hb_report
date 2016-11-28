@@ -25,6 +25,11 @@ class node:
 	WORKDIR = ''
 	THIS_IS_NODE = 0
 
+	def skip_lvl(self,level):
+		if envir.SKIP_LVL >= level:
+			return True
+		return False
+
 	def mktemp(self,dest=''):
 		tmpdir = tempfile.mkdtemp()
 		if len(dest):
@@ -248,7 +253,7 @@ class node:
 
 		for f in ptest_progs:
 			if utillib.which(f):
-				break
+				return utillib.basename(utillib.which(f))
 
 
 	def compabitility_pcmk(self):				
@@ -267,7 +272,7 @@ class node:
 		utillib.debug("setting PCMK_LIB to `dirname $CIB_DIR`")
 		envir.PCMK_LIB = utillib.dirname(envir.CIB_DIR)
 
-		PTEST = self.echo_ptest_tool()
+		envir.PTEST = self.echo_ptest_tool()
 
 	def get_cluster_type(self):
 		'''
@@ -303,17 +308,17 @@ class node:
 
 		#first get CORE_DIRS and PACKAGES
 		if envir.HA_VARLIB != envir.PCMK_LIB:
-			envir.CORE_DIRS.append(envir.HA_VARLIB+"/cores")
-			envir.CORE_DIRS.append(envir.PCMK_LIB+'/cores')
+			envir.CORES_DIRS.append(envir.HA_VARLIB+"/cores")
+			envir.CORES_DIRS.append(envir.PCMK_LIB+'/cores')
 		else:
-			envir.CORE_DIRS.append(envir.HA_VARLIB+'/cores')
+			envir.CORES_DIRS.append(envir.HA_VARLIB+'/cores')
 
 		packages = 'pacemaker libpacemaker3 pacemaker-pygui pacemaker-pymgmt pymgmt-client openais libopenais2 libopenais3 corosync libcorosync4 resource-agents cluster-glue libglue2 ldirectord libqb0 heartbeat heartbeat-common heartbeat-resources libheartbeat2 booth ocfs2-tools ocfs2-tools-o2cb ocfs2console ocfs2-kmp-default ocfs2-kmp-pae ocfs2-kmp-xen ocfs2-kmp-debug ocfs2-kmp-trace drbd drbd-kmp-xen drbd-kmp-pae drbd-kmp-default drbd-kmp-debug drbd-kmp-trace drbd-heartbeat drbd-pacemaker drbd-utils drbd-bash-completion drbd-xen lvm2 lvm2-clvm cmirrord libdlm libdlm2 libdlm3 hawk ruby lighttpd kernel-default kernel-pae kernel-xen glibc'
 		envir.PACKAGES = packages.split(" ")
 
 		if envir.USER_CLUSTER_TYPE == 'corosync':
 			envir.CONF = '/etc/corosync/corosync.conf'
-			envir.CORE_DIRS.append('/var/lib/corosync')
+			envir.CORES_DIRS.append('/var/lib/corosync')
 			envir.CF_SUPPORT = envir.HA_NOARCHBIN+'/openais_conf_support.sh'
 			envir.MEMBERSHIP_TOOL_OPTS = ''
 
