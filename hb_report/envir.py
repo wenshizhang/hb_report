@@ -99,7 +99,7 @@ MEMBERSHIP_TOOL_OPTS = ''
 
 #daemon directories
 CRM_DAEMON_DIR = ''
-PE_STATE_DIR = []
+PE_STATE_DIR = ''
 CIB_DIR = ''
 PCMK_LIB = ''
 

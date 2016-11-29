@@ -774,6 +774,36 @@ def getbt(flist,output):
 		return
 	#TODO
 	#utillib.sh getbt
+
+def num_id(passwd,uid):
+	get_pro = subprocess.Popen(['getent',passwd,uid],stdout = subprocess.PIPE,stderr = subprocess.STDOUT)
+	awk_pro = subprocess.Popen(['awk','-F:',"{print $3}"],stdin = get_pro.stdout,stdout = subprocess.PIPE)
+	n_uid = awk_pro.communicate()[0]
+	return n_uid 
+
+def chk_id()
+
+def check_perms(output,sla):
+	support =  __import__(sla.import_support())
+	print sla.import_support()
+	file_info = support.essential_files()
+	
+	for types,f,p,uid,gid in file_info:
+		if types == 'f':
+			if not os.path.isfile(f):
+				utillib.debug(f+' wrong type or doesn\'t exist')
+				continue
+		else:
+			if not os.path.isdir(f):
+				utillib.debug(f+" wrong type or doesn't exist")
+				continue
+
+		n_uid = num_id('passwd',uid)
+		if not chk_id(uid,n_uid):
+			continue
+
+
+
 		
 
 		

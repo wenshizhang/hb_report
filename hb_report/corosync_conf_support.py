@@ -78,6 +78,17 @@ def cluster_info():
 		output = coro_pro.communicate()[0]
 		return output
 
+def essential_files():
+	print 'This is a corosync cluster'
+	file_info = []
+#	file_info.append("d$"+envir.PCMK_LIB+"$0750$hacluster$haclient")
+#	file_info.append("d$"+envir.PE_STATE_DIR+"$0750$hacluster$haclient")
+#	file_info.append("d$"+envir.CIB_DIR+"$0750$hacluster$haclient")
+	file_info.append(['d',envir.PCMK_LIB,'0750','hacluster','haclient'])
+	file_info.append(['d',envir.PE_STATE_DIR,'0750','hacluster','haclient'])
+	file_info.append(['d',envir.CIB_DIR,'0750','hacluster','haclient'])
+	
+	return file_info
 
 
 

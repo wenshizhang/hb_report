@@ -184,7 +184,19 @@ class collector(node):
 			utillib.debug('found basktraces: '+' '.join(flist))
 
 	def getconfigurations(self):
-		dest = self.WORKDIR
+		dest = self.WORKDIR	
+
+		for conf in envir.CONFIGURATIONS:
+			if os.path.isfile(conf):
+				shutil.copyfile(conf,os.path.join(dest,utillib.basename(conf)))
+			elif os.path.isdir(conf):
+				files = os.listdir(conf)
+				dst = os.path.join(self.WORKDIR,utillib.basename(conf))
+				os.mkdir(dst)
+				for f in files:
+					src = os.path.join(conf,f)
+					shutil.copyfile(src,os.path.join(dst,f))
+
 
 
 	def collect_info(self):
@@ -196,6 +208,8 @@ class collector(node):
 		if not self.skip_lvl(1):
 			self.touch_DC_if_dc()
 		self.getbacktraces()
+		self.getconfigurations()
+		utillib.check_perms(os.path.join(self.WORKDIR,envir.PERMISSIONS_F),self)
 
 	def return_result(self):
 		pass
