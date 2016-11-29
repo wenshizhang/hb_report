@@ -340,7 +340,6 @@ def run():
 
 	mtr = master()
 	envir.__TMPFLIST = tempfile.mkstemp()[1]
-	print '__TMPFLIST is',envir.__TMPFLIST
 	mtr.analyzed_argvment(sys.argv)
 
 	#who am i

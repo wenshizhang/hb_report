@@ -137,6 +137,30 @@ class collector(node):
 			utillib.debug(envir.PTEST+' faild! ')
 			return
 
+	def dlm_dump(self):
+		output = os.path.join(self.WORKDIR,envir.DLM_DUMP_F)
+		if not utillib.do_which('dlm_tool'):
+			return 
+		dlm_file_info = 'NOTICE - Lockspace overview:\n'	
+		dlm_file_info = dlm_file_info + utillib.do_command(['dlm_tool','ls'])
+
+		dlm_pro = subprocess.Popen(['dlm_tool','ls'],stdout = subprocess.PIPE,stderr = subprocess.STDOUT)
+		grep_pro = subprocess.Popen(['grep','name'],stdin = dlm_pro.stdout,stdout = subprocess.PIPE,stderr = subprocess.STDOUT)
+
+		dlm_list = grep_pro.communicate()[0].split('\n')
+
+		for d in dlm_list:
+			strd = d.split()
+			for X,N in strd:
+				dlm_file_info = dlm_file_info+'\n'+'NOTICE - Lockspace '+N
+				dlm_file_info = dlm_file_info +utillib.do_command(['dlm_tool','lock_dump',N])
+
+		dlm_file_info = dlm_file_info +'\nNOTICE - Lockspace histoty:\n'
+		dlm_file_info = dlm_file_info +utillib.do_command(['dlm_tool','dump'])
+
+		utillib.writefile(output,dlm_file_info)
+
+
 
 
 	def getpeinputs(self,workdir):
@@ -197,7 +221,50 @@ class collector(node):
 					src = os.path.join(conf,f)
 					shutil.copyfile(src,os.path.join(dst,f))
 
+	def time_status(self):
+		output = os.path.join(self.WORKDIR,envir.TIME_F)
 
+		time_info = utillib.do_command(['date'])
+		time_info = time_info + utillib.do_command(['ntpdc','-pn'])
+		utillib.writefile(output,time_info)
+
+	def corosync_blackbox(self):
+		outf = os.path.join(self.WORKDIR,envir.COROSYNC_RECORDER_F)
+		from_time = envir.FROM_TIME
+		to_time = envir.TO_TIME
+
+		inpf = utillib.find_files(['/var/lib/corosync'])
+
+		if os.path.isfile(' '.join(inpf)):
+			blkbox_info = utillib.do_command(['corosync-blackbox'])
+			utillib.writefile(outf,blkbox_info)
+			utillib.do_command(['touch','-r',inpf,outf])
+
+	def getratraces(self):
+		i = 0
+		trace_dir = os.path.join(envir.HA_VARLIB,'trace_ra')
+		
+		if not os.path.isdir(trace_dir):
+			return False
+
+		utillib.debug('looking for RA trace files in '+trace_dir)
+		sed_pro = subprocess.Popen(['sed',"s,"+utillib.dirname(trace_dir)+"/,,g"],stdin = subprocess.PIPE,stdout = subprocess.PIPE)
+		flist = sed_pro.communicate(' '.join(utillib.find_file(trace_dir)))[0].split('\n')
+
+		if len(flist):
+			for f in flist:
+				shutil.copyfile(f,self.WORKDIR)
+				i = i+1
+			utillib.debug('found '+str(i)+' trace files in '+trace_dir)
+
+	def sanitize(self):
+		'''
+		Replace sensitive info with ****
+		'''
+		for f in os.path.join(self.WORKDIR,envir.B_CONF).split():
+			if os.path.isfile(f):
+				utillib.sanitize_one(f)
+		
 
 	def collect_info(self):
 		self.sys_info(os.path.join(self.WORKDIR,envir.SYSINFO_F))
@@ -210,6 +277,13 @@ class collector(node):
 		self.getbacktraces()
 		self.getconfigurations()
 		utillib.check_perms(os.path.join(self.WORKDIR,envir.PERMISSIONS_F),self)
+		self.dlm_dump()
+		self.time_status()
+		self.corosync_blackbox()
+		self.getratraces()
+
+		if not self.skip_lvl(1):
+			self.sanitize()
 
 	def return_result(self):
 		pass

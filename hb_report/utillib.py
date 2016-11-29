@@ -723,6 +723,9 @@ def add_tmpfiles(files):
 
 
 def find_files(dirs):
+	'''
+	dirs is list
+	'''
 
 	from_time = envir.FROM_TIME
 	to_time = envir.TO_TIME
@@ -747,8 +750,6 @@ def find_files(dirs):
 		add_tmpfiles(to_stamp)
 
 		findexp = findexp + ' ! -newer '+to_stamp
-#		findexp = ' ! -newer '+to_stamp
-#		command = ['find',dirs,'-type','f']
 		command = ['find']
 		command.extend(dirs)
 		command.append('-type')
@@ -781,11 +782,17 @@ def num_id(passwd,uid):
 	n_uid = awk_pro.communicate()[0]
 	return n_uid 
 
-def chk_id()
+def chk_id(ids,n_id):
+	
+	if n_id != 0:
+		return False
+	print ids,'is not found'
+	return True
+	
 
 def check_perms(output,sla):
+	msg = ''
 	support =  __import__(sla.import_support())
-	print sla.import_support()
 	file_info = support.essential_files()
 	
 	for types,f,p,uid,gid in file_info:
@@ -799,13 +806,63 @@ def check_perms(output,sla):
 				continue
 
 		n_uid = num_id('passwd',uid)
-		if not chk_id(uid,n_uid):
+		if  chk_id(uid,n_uid):
 			continue
 
-
-
+		n_gid = num_id('group',gid)
+		if chk_id(gid,n_gid):
+			continue
 		
+		if not pl_checkperms(f,p,n_uid,n_gid):
+			msg = msg+'wrong permissions or ownership for '+f
+			ls_info = do_command(['ls','-ld',f])
+			msg = msg+'\n'+str(ls_info)
 
+	writefile(output,msg)
+
+def pl_checkperms(filename,perms,in_uid,in_gid):
+
+	mode = os.stat(filename).st_mode
+	uid = os.stat(filename).st_uid
+	gid  = os.stat(filename).st_gid
+	
+	if oct((mode & 07777)) != perms:
+		return False
+
+	try:
+		if int(uid) != int(in_uid):
+			print int(uid),int(in_uid)
+			return False
+
+		if int(gid) != int(in_gid):
+			print int(gid),int(in_gid)
+			return False
+	except ValueError:
+		#uid or gid aren't numeric
+		return False
+
+	return True
+
+def sanitize_one(files):
+	compress = ''
+	if files.endswith('gz'):
+		compress = 'gzip'
+	if files.endswith('bz2'):
+		compress = 'bzip2'
+
+	if len(compress):
+		decompress = compress +' -dc'
+	else:
+		compress = 'cat'
+		decompress = 'cat'
+
+	ref = tempfile.mkstemp()[1]
+	tmp = tempfile.mkstemp()[1]
+
+	if not len(tmp) or not len(ref):
+		fatal('cannot create temporary files')
+
+	ref_mtime = os.path.getmtime(ref)
 		
 
 
