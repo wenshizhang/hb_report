@@ -176,7 +176,9 @@ class collector(node):
 			pengine_dir = os.path.join(workdir,filename)
 			os.mkdir(pengine_dir)
 			for f in flist:
-				os.symlink(f,os.path.join(pengine_dir,utillib.basename(f)))
+#				os.symlink(f,os.path.join(pengine_dir,utillib.basename(f)))
+				os.symlink(f,pengine_dir)
+				utillib.do_command(['ln','-s',f,pengine_dir])
 				i = i + 1
 			utillib.debug('found '+str(i)+' pengine input files in '+envir.PE_STATE_DIR)
 
@@ -267,6 +269,8 @@ class collector(node):
 		
 
 	def collect_info(self):
+		getstampproc = ''
+
 		self.sys_info(os.path.join(self.WORKDIR,envir.SYSINFO_F))
 		self.sys_stats()
 		utillib.getconfig(self.WORKDIR)
@@ -282,8 +286,17 @@ class collector(node):
 		self.corosync_blackbox()
 		self.getratraces()
 
-		if not self.skip_lvl(1):
-			self.sanitize()
+		#TODO
+#		if not self.skip_lvl(1):
+#			self.sanitize()
+
+		for l in envir.EXTRA_LOGS:
+			if not os.path.isfile(l):
+				continue
+
+			if l == envir.HA_LOG and l != envir.HALOG_F:
+				os.symlink(envir.HALOG_F,os.path.join(self.WORKDIR,utillib.basename(l)))
+				continue
 
 	def return_result(self):
 		pass

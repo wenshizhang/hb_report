@@ -843,6 +843,12 @@ def pl_checkperms(filename,perms,in_uid,in_gid):
 
 	return True
 
+def sanitize_hacf():
+	print 'call function sanitize_hacf from utillib module'
+
+def sanitize_xml_attr(msg):
+	print msg
+
 def sanitize_one(files):
 	compress = ''
 	if files.endswith('gz'):
@@ -862,11 +868,35 @@ def sanitize_one(files):
 	if not len(tmp) or not len(ref):
 		fatal('cannot create temporary files')
 
+	add_tmpfiles(tmp)
+	add_tmpfiles(ref)
+
+	if not len(tmp) or not len(ref):
+		fatal("cannot create temporary files")
 	ref_mtime = os.path.getmtime(ref)
-		
+
+	if basename(files) == 'ha.cf':
+		sanitize_hacf()
+	else:
+		pass
+#		print decompress
+#		msg = do_command([decompress])
+#		msg = santize_xml_attr()
+#		print msg 
+#		print compress
+
+def getstamp_syslog(message):
+	return ''.join(message.split()[0:2])
+
+def find_getstampproc(sla,filepath):
+	'''
+	Now  we do not need to get log from /var/log/messages and /var/log/pacemaker.log
+	'''
+	pass
 
 
 
+	
 
 
 

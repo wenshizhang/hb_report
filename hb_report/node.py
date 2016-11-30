@@ -17,6 +17,8 @@ import	subprocess
 
 from StringIO import StringIO
 from crmsh import config
+from crmsh	import utils
+from crmsh	import logparser
 from multiprocessing import Process
 
 class node:
@@ -352,6 +354,10 @@ class node:
 			else:
 				utillib.debug('reading log settings from '+envir.LOGD_CF)
 				corosync.get_logd_logvars()
+	
+	def change_to_timestamp(self,time):
+		ds = utils.parse_to_timestamp(time)
+		return ds
 
 	def import_support(self):
 		global support

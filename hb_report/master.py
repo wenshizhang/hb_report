@@ -180,9 +180,9 @@ class master(node):
 	def find_ssh_user(self):
 		pass
 
-	def change_to_timestamp(self,time):
-		ds = utils.parse_to_timestamp(time)
-		return ds
+#	def change_to_timestamp(self,time):
+#		ds = utils.parse_to_timestamp(time)
+#		return ds
 
 	def analyzed(self):
 		pass
