@@ -263,10 +263,36 @@ class collector(node):
 		'''
 		Replace sensitive info with ****
 		'''
+		need_replace_files = []
 		for f in os.path.join(self.WORKDIR,envir.B_CONF).split():
 			if os.path.isfile(f):
 				utillib.sanitize_one(f)
-		
+		rc = 0
+
+		try:
+			dirs = os.path.join(self.WORKDIR,envir.CIB_F).split()
+		except OSError:
+			pass
+		else:
+			need_replace_files.extend(dirs)
+
+		try:
+			dirs = os.listdir(os.path.join(self.WORKDIR,'pengine'))
+		except OSError:
+			pass
+		else:
+			need_replace_files.extend(dirs)
+
+
+		for n in need_replace_files:
+			if os.path.isfile(n):
+				if envir.DO_SANITIZE:
+					utillib.sanitize_one(n)
+				else:
+					if utillib.test_sensitive_one(n):
+						utillib.warning('some PE or CIB file contain possibly sensitive data')
+						utillib.warning('you may not want to send this report to a public mailing list')
+
 
 	def collect_info(self):
 		getstampproc = ''
@@ -286,9 +312,8 @@ class collector(node):
 		self.corosync_blackbox()
 		self.getratraces()
 
-		#TODO
-#		if not self.skip_lvl(1):
-#			self.sanitize()
+		if not self.skip_lvl(1):
+			self.sanitize()
 
 		for l in envir.EXTRA_LOGS:
 			if not os.path.isfile(l):

@@ -399,7 +399,7 @@ def creat_xml():
 	ET.SubElement(root,'HA_LOG').text = envir.HA_LOG
 	ET.SubElement(root,'UNIQUE_MSG').text = envir.UNIQUE_MSG
 	ET.SubElement(root,'SANITIZE').text = '$'.join(envir.SANITIZE)
-	ET.SubElement(root,'DO_SANITIZE').text = envir.DO_SANITIZE
+	ET.SubElement(root,'DO_SANITIZE').text = str(envir.DO_SANITIZE)
 	ET.SubElement(root,'SKIP_LVL').text = str(envir.SKIP_LVL)
 	ET.SubElement(root,'EXTRA_LOGS').text = '$'.join(envir.EXTRA_LOGS)
 	ET.SubElement(root,'PCMK_LOG').text = envir.PCMK_LOG
@@ -450,7 +450,7 @@ def parse_xml():
 		if t.tag == 'SANITIZE':
 			envir.SANITIZE = t.text.split('$')
 		if t.tag == 'DO_SANITIZE':
-			envir.DO_SANIZITE = t.text
+			envir.DO_SANIZITE = int(t.text)
 		if t.tag == 'SKIP_LVL':
 			envir.SKIP_LVL = int(t.text)
 		if t.tag == 'EXTRA_LOGS':
@@ -843,47 +843,49 @@ def pl_checkperms(filename,perms,in_uid,in_gid):
 
 	return True
 
+def is_sensitive_xml(files):
+	
+	for patt in envir.SANITIZE:
+		ret = do_command(['egrep','-s','name="'+patt+'"',files])
+		if len(ret):
+			return True
+	
+	return False
+
+def test_sensitive_one(files):
+	'''
+	Unsupport files are compressed, just like sentive_one 
+	'''
+	return is_sensitive_xml(files)
+
+
 def sanitize_hacf():
 	print 'call function sanitize_hacf from utillib module'
 
-def sanitize_xml_attr(msg):
-	print msg
+def sanitize_xml_attr(files):
+	'''
+	Unsupport files are compressed, line gzip ang  bzip2
+	Need to be finished
+	'''
+	source = open(files,'r')
+	lines = source.readlines()
+	source.close()
+
+	source = open(files,'w')
+	
+	for msg in lines:
+		for patt in envir.SANITIZE:
+			if re.search('name="'+patt+'"',msg):
+				msg = re.sub('value="[^"]*"','value="****"',msg)
+
+		source.write(msg)
 
 def sanitize_one(files):
-	compress = ''
-	if files.endswith('gz'):
-		compress = 'gzip'
-	if files.endswith('bz2'):
-		compress = 'bzip2'
-
-	if len(compress):
-		decompress = compress +' -dc'
-	else:
-		compress = 'cat'
-		decompress = 'cat'
-
-	ref = tempfile.mkstemp()[1]
-	tmp = tempfile.mkstemp()[1]
-
-	if not len(tmp) or not len(ref):
-		fatal('cannot create temporary files')
-
-	add_tmpfiles(tmp)
-	add_tmpfiles(ref)
-
-	if not len(tmp) or not len(ref):
-		fatal("cannot create temporary files")
-	ref_mtime = os.path.getmtime(ref)
 
 	if basename(files) == 'ha.cf':
 		sanitize_hacf()
 	else:
-		pass
-#		print decompress
-#		msg = do_command([decompress])
-#		msg = santize_xml_attr()
-#		print msg 
-#		print compress
+		sanitize_xml_attr(files)
 
 def getstamp_syslog(message):
 	return ''.join(message.split()[0:2])
