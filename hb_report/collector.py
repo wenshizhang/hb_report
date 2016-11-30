@@ -10,6 +10,7 @@ import	platform
 import	threading
 import	shutil
 import	tempfile
+import	tarfile
 
 from node import node
 
@@ -24,7 +25,6 @@ class collector(node):
 		create file WORKDIR/sysinfo.txt
 		'''
 		msg = ''
-		print 'WORKDIR IS',self.WORKDIR
 		f = open(filename,'w')
 		support = __import__(self.import_support())
 		cluster_version = support.cluster_info()
@@ -324,7 +324,13 @@ class collector(node):
 				continue
 
 	def return_result(self):
-		pass
+		'''
+		Return logs to master through stdout
+		create tarfile in WORKDIR
+		'''
+		print self.WORKDIR
+		tar_path = os.path.join(self.WORKDIR,basename(self.WORKDIR)+'.tar.bz2')
+		utillib.do_command(['tar','-cvjSf',tar_path,self.WORKFIR])
 
 
 def run(master_flag):
@@ -363,6 +369,7 @@ def run(master_flag):
 		sys.exit(1)
 
 	sla.collect_info()
+	sla.return_result()
 
 #run()
 #

@@ -12,6 +12,7 @@ import	subprocess
 import	collector
 import	paramiko
 import	tempfile
+import	tarfile
 
 from crmsh	import logtime
 from crmsh	import utils
@@ -186,25 +187,28 @@ class master(node):
 
 	def analyzed(self):
 		pass
+
 	
+	def create_collector_dir(self):
+		pass
+
 	def start_slave_collector(self,nodes,port=22,username='root'):
 
 		utillib.debug('running class collector function run to collect log on '+nodes)
-		if nodes == self.WE:
-			collector.run(1)
-		else:
-			paramiko.util.log_to_file('/tmp/paramiko.log')
-			client = paramiko.SSHClient()
-			client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-			client.connect(nodes,port,username)
 
-			#TODO
-			#need to finish the hb_report path
-			path = os.path.join(envir.CRM_PATH,'collector.py')
-			utillib.debug(nodes+' collector script path :'+path)
-			stdin,stdout,stderr = client.exec_command('python ~/hb_report/hb_report __slave')
-			print nodes,' output :',stdout.read()
-			utillib.debug(nodes+' collect log is done')
+		paramiko.util.log_to_file('/tmp/paramiko.log')
+		client = paramiko.SSHClient()
+		client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+		client.connect(nodes,port,username)
+
+		path = os.path.join(envir.CRM_PATH,'collector.py')
+		utillib.debug(nodes+' collector script path :'+path)
+
+		#need to finish the hb_report path
+		stdin,stdout,stderr = client.exec_command('python ~/hb_report/hb_report __slave')
+		
+		print nodes,' output :',stdout.read()
+
 
 	def events(self):
 		pass
@@ -348,6 +352,7 @@ def run():
 	#get WORKDIR
 	mtr.WORKDIR = mtr.mktemp(envir.DEST)
 	mtr.WORKDIR = os.path.join(mtr.WORKDIR,envir.DEST)
+	envir.MASTER_WORKDIR = mtr.WORKDIR
 	mtr.compabitility_pcmk()
 	mtr.cluster_type()
 	support=__import__(mtr.import_support())

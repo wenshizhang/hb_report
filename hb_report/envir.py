@@ -118,3 +118,5 @@ XML_PATH = '/tmp'
 #other stuff
 __TMPFLIST = ''
 PTEST = ''
+MASTER_WORKDIR = ''
+

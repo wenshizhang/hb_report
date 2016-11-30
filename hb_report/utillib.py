@@ -412,6 +412,7 @@ def creat_xml():
 	ET.SubElement(root,'XML_PATH').text = str(envir.XML_PATH)
 	ET.SubElement(root,'XML_NAME').text = str(envir.XML_NAME)
 	ET.SubElement(root,'HA_BIN').text = str(envir.HA_BIN)
+	ET.SubElement(root,'MASTER_WORKDIR').text = str(envir.MASTER_WORKDIR)
 
 
 
@@ -475,6 +476,8 @@ def parse_xml():
 			envir.XML_PATH = t.text
 		if t.tag == 'HA_BIN':
 			envir.HA_BIN = t.text
+		if t.tag == 'MASTER_WORKDIR':
+			envir.MASTER_WORKDIR = t.text
 
 #		os.remove(path)
 
