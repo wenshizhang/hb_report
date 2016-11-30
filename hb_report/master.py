@@ -421,6 +421,15 @@ def run():
 	elif is_node:
 		mtr.collecct_for_nodes([mtr.WE])
 
+#
+#part 5: endgame:
+#		 slaves  tar their result to stdout, the master wait
+#		 for them, analyses result, asks the user to edit the
+#		 problem description template, and print final words
+#
+
+	p = Process()
+
 #try:
 run()
 #except OSError as msg:

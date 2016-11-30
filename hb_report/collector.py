@@ -327,10 +327,8 @@ class collector(node):
 		'''
 		Return logs to master through stdout
 		create tarfile in WORKDIR
+		do not know how to send log to master node
 		'''
-		print self.WORKDIR
-		tar_path = os.path.join(self.WORKDIR,basename(self.WORKDIR)+'.tar.bz2')
-		utillib.do_command(['tar','-cvjSf',tar_path,self.WORKFIR])
 
 
 def run(master_flag):
