@@ -413,6 +413,7 @@ def creat_xml():
 	ET.SubElement(root,'XML_NAME').text = str(envir.XML_NAME)
 	ET.SubElement(root,'HA_BIN').text = str(envir.HA_BIN)
 	ET.SubElement(root,'MASTER_WORKDIR').text = str(envir.MASTER_WORKDIR)
+	ET.SubElement(root,'MASTER').text = str(envir.MASTER)
 
 
 
@@ -424,9 +425,6 @@ def creat_xml():
 	f = open(path,'w')
 	f.write(tree)
 	f.close()
-
-#	tree = ET.ElementTree(root)
-#	tree.write('envir.xml')
 
 def parse_xml():
 	'''
@@ -478,8 +476,8 @@ def parse_xml():
 			envir.HA_BIN = t.text
 		if t.tag == 'MASTER_WORKDIR':
 			envir.MASTER_WORKDIR = t.text
-
-#		os.remove(path)
+		if t.tag == 'MASTER':
+			envir.MASTER = t.text
 
 def check_user():
 	'''

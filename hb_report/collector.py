@@ -11,6 +11,8 @@ import	threading
 import	shutil
 import	tempfile
 import	tarfile
+import  time
+import StringIO
 
 from node import node
 
@@ -293,6 +295,13 @@ class collector(node):
 						utillib.warning('some PE or CIB file contain possibly sensitive data')
 						utillib.warning('you may not want to send this report to a public mailing list')
 
+	def mvenv(self):
+		env_src_path = os.path.join(envir.XML_PATH,envir.XML_NAME)
+		env_dst_path = os.path.join(self.WORKDIR,envir.XML_NAME)
+		print env_dst_path,env_src_path
+#		shutil.copyfile(env_src_path,self.WORKDIR)
+		shutil.move(env_src_path,self.WORKDIR)
+		return 
 
 	def collect_info(self):
 		getstampproc = ''
@@ -311,7 +320,7 @@ class collector(node):
 		self.time_status()
 		self.corosync_blackbox()
 		self.getratraces()
-
+#		self.mvenv()
 		if not self.skip_lvl(1):
 			self.sanitize()
 
@@ -325,10 +334,22 @@ class collector(node):
 
 	def return_result(self):
 		'''
-		Return logs to master through stdout
+		Return logs to master through scp
 		create tarfile in WORKDIR
-		do not know how to send log to master node
 		'''
+		tarname = self.WE+'.tar'
+		print self.WORKDIR
+		print envir.MASTER
+		tarpath = os.path.join(self.WORKDIR,tarname)
+		start=time.time()
+		tar = tarfile.open(tarpath, 'w')
+		tar.add(self.WORKDIR)
+		tar.close()
+
+		command = ['scp',tarpath,'-rf','root@'+envir.MASTER+':'+envir.MASTER_WORKDIR]
+
+		msg = utillib.do_command(command)
+
 
 
 def run(master_flag):

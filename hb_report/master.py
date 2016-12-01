@@ -208,7 +208,7 @@ class master(node):
 		stdin,stdout,stderr = client.exec_command('python ~/hb_report/hb_report __slave')
 		
 		print nodes,' output :',stdout.read()
-
+		print nodes,' error: ',stderr.read()
 
 	def events(self):
 		pass
@@ -226,7 +226,7 @@ class master(node):
 		if not utillib.do_which('scp'):
 			utillib.fatal('Cannot find scp, does it is intalled?')
 		if nodes != self.WE:
-			command = 'scp '+os.path.join(envir.XML_PATH,envir.XML_NAME)+' root@'+nodes+':/tmp &>/dev/null'
+			command = 'scp '+os.path.join(envir.XML_PATH,envir.XML_NAME)+' root@'+nodes+':'+envir.XML_PATH+' &>/dev/null'
 			ret = os.system(command)
 			if ret:
 				utillib.fatal(nodes+' :scp envitonment file failed, please check cluster node can ssh or not')
@@ -348,6 +348,7 @@ def run():
 
 	#who am i
 	mtr.WE= socket.gethostname()
+	envir.MASTER = mtr.WE
 	
 	#get WORKDIR
 	mtr.WORKDIR = mtr.mktemp(envir.DEST)
@@ -429,6 +430,7 @@ def run():
 #
 
 	p = Process()
+	print 'master workdir is ',mtr.WORKDIR
 
 #try:
 run()

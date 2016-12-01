@@ -112,11 +112,11 @@ HA_DIR = ''
 
 #send env
 CRM_PATH = '/usr/hb_report'
-XML_NAME = 'envirver.xml'
+XML_NAME = '.env.xml'
 XML_PATH = '/tmp'
 
 #other stuff
 __TMPFLIST = ''
 PTEST = ''
 MASTER_WORKDIR = ''
-
+MASTER = ''
