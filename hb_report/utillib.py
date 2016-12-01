@@ -44,7 +44,7 @@ def fatal(msg):
 	print >> sys.stderr,socket.gethostname(),"ERROR:",msg
 	sys.exit(1)
 
-def warn(msg):
+def warning(msg):
 	print >>sys.stderr,socket.gethostname(),"WARN:",msg
 
 def info(msg):

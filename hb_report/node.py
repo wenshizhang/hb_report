@@ -35,6 +35,7 @@ class node:
 	def mktemp(self,dest=''):
 		tmpdir = tempfile.mkdtemp()
 		if len(dest):
+			print tmpdir,dest
 			path = os.path.join(tmpdir,dest)
 			os.mkdir(path)
 		return tmpdir
@@ -200,6 +201,7 @@ class node:
 			
 			p = Process(target=self.start_slave_collector,args=(n,))
 			p.start()
+
 
 
 	def get_pe_state_dir(self):

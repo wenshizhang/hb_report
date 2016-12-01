@@ -255,7 +255,7 @@ class master(node):
 		'''
 		if envir.NODE_SOURCE != 'user':
 			return 
-		NODECNT = len(envir.NODE)
+		NODECNT = len(envir.USER_NODES)
 		if not NODECNT:
 			utillib.fatal('could not figure out a list of nodes; is this a cluster node?')
 
@@ -331,12 +331,19 @@ class master(node):
 			
 		return 0
 
+	def get_result(self):
+		
+		for n in envir.USER_NODES:
+			if n+'.tar' not in os.listdir(self.WORKDIR):
+				utillib.warning('NOTICE: '+n+' not return logs!')
+			else:
+				tar = tarfile.open(n+'.tar','r:')
+				tar.extractall(path=self.WORKDIR)
 
 def run():
 	'''
 	This method do most of the job that master node should do
 	'''
-
 	
 	utillib.check_user()
 	utillib.setvarsanddefaults()
@@ -405,7 +412,7 @@ def run():
 #
 #part 4: find the logs and cut out the segment for the period
 #
-	if THIS_IS_NODE:
+	if mtr.THIS_IS_NODE:
 		mtr.getlog()
 	
 	#create xml before collect
@@ -424,13 +431,11 @@ def run():
 
 #
 #part 5: endgame:
-#		 slaves  tar their result to stdout, the master wait
-#		 for them, analyses result, asks the user to edit the
+#		 slaves  tar their result to stdout, send it to master,
+#		 then master analyses result, asks the user to edit the
 #		 problem description template, and print final words
 #
-
-	p = Process()
-	print 'master workdir is ',mtr.WORKDIR
+	mtr.get_result()
 
 #try:
 run()
