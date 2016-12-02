@@ -6,8 +6,10 @@ This directory include hb_report all the codes(implement with python). There are
 
 The defination of master class, when user use the hb_report command, in the crm report script, some secure things is done, then crm script call master_node run function. Master do all things  master node should do, like decide to which log is collected, check ssh connections and so on.
 ### class master
+
 ####MEMBER VARABLES
 * PIDS: master create new processes to collect logs, master should wait those processes exit. PIDS stores those processes' pid
+
 ####MEMBER FUNCTIONS
 * version: print hb_report version information
 * usage: print help message
