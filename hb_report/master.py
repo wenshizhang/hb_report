@@ -21,9 +21,9 @@ from node	import node
 from multiprocessing import Process
 
 class master(node):
-	SUDO = ''
-	LOCAL_SUDO = ''
-	COLLECTOR_PIDS =[]
+#	SUDO = ''
+#	LOCAL_SUDO = ''
+	PIDS =[]
 
 	def version(self):
 		print "crmsh: 2.2.0+git.1464769043.9e4df55"
@@ -169,29 +169,48 @@ class master(node):
 			envir.SSH_USER.append("root")
 			envir.SSH_USER.append("hacluster")
 
-	def cts_findlogseg(self):
-		'''
-		'''
-		#TODO
-		return 'test message'
-		utillib.debug('This is cts find log function, need to be finished later!:)')
-	def is_node(self):
+	def analyze_one(self,files):
 		pass
-
-	def find_ssh_user(self):
-		pass
-
-#	def change_to_timestamp(self,time):
-#		ds = utils.parse_to_timestamp(time)
-#		return ds
-
-	def analyzed(self):
-		pass
-
 	
-	def create_collector_dir(self):
+	def consoli_date(self,files):
+		pass
+	
+	def check_crmvfy(self,files):
 		pass
 
+	def check_backtrace(self):
+		pass
+
+	def check_permissions(self):
+		pass
+	
+
+	def analyze(self):
+		'''
+		Check every logs we need are collected
+		'''
+		outf = os.path.join(self.WORKDIR,envir.ANALYSIS_F)
+		f = open(out,'w')
+		ana_msg = ''
+		flist = [envir.HOSTCACHE,envi.MEMBERSHIP_F,envir.CIB_F,envir.CRM_MON_F,envir.B_COINF,envir.SYSINFO_F,'logd.cf']
+
+		for f in flist:
+			msg = 'Diff '+f+'...\n'
+			if f not in os.listdir(self.WORKDIR):
+				ana_msg = ana_msg+'no '+f+':/\n'
+			elif self.analyze_one(f):
+				ana_msg = ana_msg +'OK\n'
+				if f != envir.CIB_F:
+					self.consolidate(f)
+			write(ana_msg)
+
+		self.check_crmvfy()
+		self.check_backtrace()
+		self.check_permissions()
+		self.check_logs()
+
+		f.close()
+	
 	def start_slave_collector(self,nodes,port=22,username='root'):
 
 		utillib.debug('running class collector function run to collect log on '+nodes)
@@ -209,6 +228,8 @@ class master(node):
 		
 		print nodes,' output :',stdout.read()
 		print nodes,' error: ',stderr.read()
+
+		self.PIDS.append(os.getpid())
 
 	def events(self):
 		pass
@@ -233,16 +254,11 @@ class master(node):
 
 	def get_user_node_cts(self,ctslog):
 		#TODO
-		print 'This need to get cts user nodes'
-
+		utillib.debug('need to finish later')
 	
 	def get_cts_log(self):
-		ctslog = utillib.findmsg('CTS: Stack:')
-		debug_msg = 'Using CTS control file :'+ctslog
-		utillib.debug(debug_msg)
 		#TODO
-#		envir.USER_NODES = self.get_user_node_cts(ctslog)
-		envir.NODES_SOURCE = 'user'
+		utillib.debug('need to finish later')
 		
 	def is_member(self):
 		'''
@@ -253,6 +269,7 @@ class master(node):
 		envir.NODE_SOURCE can tell the func where did hv_report get node
 		only from user need to check
 		'''
+		#TODO
 		if envir.NODE_SOURCE != 'user':
 			return 
 		NODECNT = len(envir.USER_NODES)
@@ -284,7 +301,7 @@ class master(node):
 
 	def findsshuser(self):
 		'''
-		If user not provide ssh users, then hb_report find ssh user by it self
+		If user not provide ssh users, find ssh user by itself
 		'''
 		rc = 0
 
@@ -321,7 +338,7 @@ class master(node):
 				envir.SSH_PASSWD_NODES = envir.SSH_PASSWD_NODES+n
 
 		if len(envir.SSH_PASSWD_NODES):
-			utillib.warn('passwordless ssh to node(s) '+envir.SSH_PASSWD_NODES+' does not work')
+			utillib.warning('passwordless ssh to node(s) '+envir.SSH_PASSWD_NODES+' does not work')
 		
 		if ssh_user == '__undef':
 			return 1
@@ -332,13 +349,17 @@ class master(node):
 		return 0
 
 	def get_result(self):
-		
+
+		for p in self.PIDS:
+			print os.waitpid(p,0)
 		for n in envir.USER_NODES:
 			if n+'.tar' not in os.listdir(self.WORKDIR):
 				utillib.warning('NOTICE: '+n+' not return logs!')
 			else:
-				tar = tarfile.open(n+'.tar','r:')
+				tar = tarfile.open(os.path.join(self.WORKDIR,n+'.tar'),'r:')
 				tar.extractall(path=self.WORKDIR)
+				tar.close()
+				self.RM_FILES.append(os.path.join(self.WORKDIR,n+'.tar'))
 
 def run():
 	'''
@@ -382,10 +403,10 @@ def run():
 
 	for n in envir.USER_NODES:
 		if n == mtr.WE:
-			THIS_IS_NODE = 1
+			mtr.THIS_IS_NODE = 1
 
 	if not mtr.is_node and envir.NODE_SOUECE != 'user':
-		utillib.warn('this is not a node and you didn\'t specify a list of nodes using -n')
+		utillib.warning('this is not a node and you didn\'t specify a list of nodes using -n')
 	
 #
 #part 2: ssh business
@@ -430,12 +451,23 @@ def run():
 		mtr.collecct_for_nodes([mtr.WE])
 
 #
-#part 5: endgame:
+#part 5:
 #		 slaves  tar their result to stdout, send it to master,
 #		 then master analyses result, asks the user to edit the
 #		 problem description template, and print final words
 #
 	mtr.get_result()
+
+	analyze_p = Process(target = mtr.analyze)
+	analyze_p.start()
+
+#
+#part 6: endgame: 
+#		 remove tmpfiles and logs we do not need
+#
+
+	utillib.remove_files(mtr)
+
 
 #try:
 run()

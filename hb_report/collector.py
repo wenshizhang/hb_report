@@ -298,7 +298,6 @@ class collector(node):
 	def mvenv(self):
 		env_src_path = os.path.join(envir.XML_PATH,envir.XML_NAME)
 		env_dst_path = os.path.join(self.WORKDIR,envir.XML_NAME)
-		print env_dst_path,env_src_path
 #		shutil.copyfile(env_src_path,self.WORKDIR)
 		shutil.move(env_src_path,self.WORKDIR)
 		return 
@@ -318,9 +317,9 @@ class collector(node):
 		utillib.check_perms(os.path.join(self.WORKDIR,envir.PERMISSIONS_F),self)
 		self.dlm_dump()
 		self.time_status()
+		self.getlog()
 		self.corosync_blackbox()
 		self.getratraces()
-#		self.mvenv()
 		if not self.skip_lvl(1):
 			self.sanitize()
 
@@ -338,17 +337,23 @@ class collector(node):
 		create tarfile in WORKDIR
 		'''
 		tarname = self.WE+'.tar'
-		print self.WORKDIR
-		print envir.MASTER
 		tarpath = os.path.join(self.WORKDIR,tarname)
 		start=time.time()
 		tar = tarfile.open(tarpath, 'w')
-		tar.add(self.WORKDIR)
+
+		curr_dir = os.getcwd()
+		os.chdir(utillib.dirname(self.WORKDIR))
+		tar.add(utillib.basename(self.WORKDIR))
 		tar.close()
+		
+		os.chdir(curr_dir)
 
 		command = ['scp',tarpath,'-rf','root@'+envir.MASTER+':'+envir.MASTER_WORKDIR]
 
 		msg = utillib.do_command(command)
+
+		self.RM_FILES.append(self.WORKDIR)
+		self.RM_FILES.append(tarpath)
 
 
 
@@ -390,5 +395,9 @@ def run(master_flag):
 	sla.collect_info()
 	sla.return_result()
 
-#run()
 #
+#part 4: endgames:
+#		 remove tmpfile and logs we do not need
+#
+	utillib.remove_files(sla)
+

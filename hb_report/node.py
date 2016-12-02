@@ -26,6 +26,7 @@ class node:
 	WE = ''
 	WORKDIR = ''
 	THIS_IS_NODE = 0
+	RM_FILES = []
 
 	def skip_lvl(self,level):
 		if envir.SKIP_LVL >= level:
@@ -141,12 +142,12 @@ class node:
 		'''
 		outf = os.path.join(self.WORKDIR,envir.HALOG_F)
 
-		#collect journal firm systemd
+		#collect journal from systemd
 		self.collect_journal(self.WORKDIR)
 		
 		if len(envir.HA_LOG):
 			if not os.path.isfile(envir.HA_LOG):
-				utillib.warn(envir.HA_LOG+' not found; We will try to find log ourselves')
+				utillib.warning(envir.HA_LOG+' not found; We will try to find log ourselves')
 			envir.HA_LOG = ''
 		
 		if envir.HA_LOG == '':
@@ -175,7 +176,7 @@ class node:
 			fd.close()
 
 		else:
-			global getstamproc
+			global getstampproc
 			getstampproc = utillib.find_getstampproc()
 			if len(getstampproc):
 				msg = self.dumplogset()
@@ -188,6 +189,13 @@ class node:
 
 	def node_need_pwd(self,nodes):
 		pass
+
+	def cts_findlogseg(self):
+		'''
+		'''
+		#TODO
+		return ''
+		utillib.debug('This is cts find log function, need to be finished later!:)')
 
 	def collect_for_nodes(self,nodes):
 		'''
@@ -202,7 +210,7 @@ class node:
 			p = Process(target=self.start_slave_collector,args=(n,))
 			p.start()
 
-
+			self.PIDS.append(p.pid)
 
 	def get_pe_state_dir(self):
 		'''
@@ -309,7 +317,6 @@ class node:
 		'''
 		Get some dirs
 		'''
-
 		#first get CORE_DIRS and PACKAGES
 		if envir.HA_VARLIB != envir.PCMK_LIB:
 			envir.CORES_DIRS.append(envir.HA_VARLIB+"/cores")
@@ -371,9 +378,6 @@ class node:
 			#import ha_conf_support as support
 			
 	def conf(self):
-		pass
-
-	def check_this_is_node(self):
 		pass
 
 
