@@ -379,15 +379,6 @@ def findmsg():
 	return log
 
 
-def finf_getstampproc():
-	t = 0
-	l = ''
-	func = ''
-	trycnt = 10
-
-	#TODO
-	pass
-
 def creat_xml():
 
 	root = ET.Element('root')
