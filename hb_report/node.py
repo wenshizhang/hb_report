@@ -6,7 +6,9 @@
 # Description:
 #########################################################################
 import	os
+import	re
 import	sys
+import	time
 import	tempfile
 import	envir
 import	utillib
@@ -35,6 +37,7 @@ class node:
 
 	def mktemp(self,dest=''):
 		tmpdir = tempfile.mkdtemp()
+#		self.RM_FILES.append(tmpdir)
 		if len(dest):
 			print tmpdir,dest
 			path = os.path.join(tmpdir,dest)
@@ -45,7 +48,7 @@ class node:
 		'''
 		Get envir.CRM_DARMON_DIR
 		'''
-		libdir = utillib.dirname(envir.HA_BIN)
+		libdir = os.path.dirname(envir.HA_BIN)
 		for p in ['/pacemaker','/heartbeat']:
 			if os.access(libdir+p+'/crmd',os.X_OK):
 				utillib.debug("setting CRM_DAEMON_DIR to"+libdir+p)
@@ -116,6 +119,11 @@ class node:
 		if os.path.isfile(logf):
 			return logf
 
+		if len(envir.EXTRA_LOGS):
+			for l in envir.EXTRA_LOGS:
+				if os.path.isfile(l) and l != envir.PCMK_LOG:
+					return l
+
 		if os.path.isfile(os.path.join(self.WORKDIR,envir.JOURNAL_F)):
 			return os.path.join(self.WORKDIR,envir.JOURNAL_F)
 
@@ -132,15 +140,176 @@ class node:
 		if len(snd_logf):
 			utillib.debug('will try with '+snd_logf)
 
-	def dumplogset():
-		#TODO
-		pass
+	def find_decompressor(self,logf):
+		'''
+		if system log is compressed , we need find uncompress command
+		'''
+		if logf.endswith('bz2'):
+			return 'bzip2 -dc'
+		elif logf.endswith('gz'):
+			return 'gzip -dc'
+		elif logf.endswith('xz'):
+			return 'xz -dc'
+		elif os.path.isfile(logf):
+			return 'cat'
+		else:
+			return 'echo'
+
+	def get_ts(self,line):
+		ts = 0
+		if len(line):
+			func_getstamp = getattr(utillib,getstampproc)
+			ts = int(self.change_to_timestamp(func_getstamp(line)))
+
+		return ts
+
+
+	def find_first_ts(self,message):
+		for l in message.split('\n'):
+			if not len(l):
+				break
+			ts = self.get_ts(l)
+			if ts:
+				return ts
+			utillib.warning('cannot extract time: |'+l+'|; will try the next one')
+
+	def is_our_log(self,logf,from_time,to_time):
+		'''
+		check if log contains a piece of our segment
+		'''
+		cat = self.find_decompressor(logf).split()
+		cat.append(logf)
+
+		head_msg = utillib.do_command(['head','-10'],utillib.do_command(cat))
+		first_time = self.find_first_ts(head_msg)
+
+		tail_msg = utillib.do_command(['tail','-10'],utillib.do_command(cat))
+		tail_msg = utillib.do_command(['tac'],tail_msg)
+		last_time = self.find_first_ts(tail_msg)
+
+		if from_time > last_time:
+			#we're pass good logs; exit
+			return 2
+
+		elif from_time >= first_time:
+			#this is last good log
+			return 3
+		elif to_time == 0 or to_time >= first_time:
+			#have to go further back
+			#include this log
+			return 1
+		else:
+			#donot include this log
+			return 0
+
+	def arch_logs(self,logf,from_time, to_time):
+		next_log = []
+		return_log = []
+
+		#look for the file such as: ha-log-20090308 or 
+		#ha-log-20090308.gz(.ba2) or ha-log.0,etc
+		#the date need to match user input or today
+
+		if not os.path.isdir(logf):
+			next_log = os.listdir(os.path.dirname(logf))
+			dirname = os.path.dirname(logf)
+		else:
+			next_log = os.listdir(logf)
+			dirname = logf
+
+		for n in next_log:
+			ret = -1
+			if re.search('^'+os.path.basename(logf)+'[0-9]*.*',n):
+				if re.search('\d+',n):
+					if n.find(envir.DATE) != -1:
+						ret = self.is_our_log(n,from_time,to_time)
+				else:
+					 ret = self.is_our_log(os.path.join(dirname,n),from_time,to_time)
+			if ret == 0:
+				pass
+			elif ret ==1:
+				utillib.debug('found log '+next_log)
+				return_log.append(os.path.join(dirs,n))
+			elif ret == 2:
+				#do not have to go to older logs
+				break;
+			elif ret == 3:
+				return_log.append(os.path.join(dirname,n))
+
+		return return_log
+
+	def find_logseg(self,logf,from_time,to_time):
+		logseg_path = os.path.join(envir.HA_NOARCHBIN,'print_logseg')
+		if os.access(logseg_path,os.F_OK) and os.access(logsef_path,os.X_OK):
+			utillib.do_command([logseg_path,logf,from_time,to_time])
+
+		cat = self.find_decompressor(logf).split()
+		cat.append(logf)
+		srcstr = utillib.do_command(cat)
+		srcf = tempfile.mkstemp()[1]
+		self.RM_FILES.append(srcf)
+		srcfd = open(srcf,'w')
+		srcfd.write(srcstr)
+		srcfd.close()
+
+		if from_time == 0:
+			FROM_LINE = 1
+		else:
+			FROM_LINE = utillib.findln_by_time(self,srcf,from_time)
+		if not FROM_LINE:
+			warning("couldn't find line for time "+from_time+'; corrupt log file?')
+			return ''
+
+		TO_LINE = 0
+
+		if to_time != 0:
+			TO_LINE = utillib.findln_by_time(self,srcf,to_time)
+			if not TO_LINE:
+				utillib.warning("couldn't find for time "+to_time+'; corrupt log file?')
+				return ''
+
+		utillib.debug('including log segment['+str(FROM_LINE)+'-'+str(TO_LINE)+'] from'+logf)
+		return '\n'.join(srcstr.split('\n')[FROM_LINE:TO_LINE])
+
+	def dumplogset(self):
+		'''
+		find log/set of logs which are interesting for us
+		'''
+		logf = envir.HA_LOG
+		from_time = int(envir.FROM_TIME)
+		to_time = int(envir.TO_TIME)
+
+		logf_set = self.arch_logs(logf,from_time,to_time)
+		if not len(logf_set):
+			return ''
+
+		oldest = logf_set[len(logf_set)-1]
+		newest = logf_set[0]
+		if len(logf_set)>2:
+			logf_set.remove(oldest)
+			logf_set.remove(newest)
+			mid_logfiles = logf_set
+		else:
+			mid_logfiles = []
+
+		if len(logf_set) == 1:
+			logseg = self.find_logseg(newest,from_time,to_time)
+		else:
+			logseg = self.find_logseg(oldest,from_time,0)
+			for f in mid_logfiles:
+				self.find_log(f)
+				utillib.debug('including complete '+f+' logfile')
+			logseg = self.find_logseg(newest,0,to_time)
+
+		return logseg
 	
 	def getlog(self):
 		'''
 		Get Specify Logs
 		'''
+		global getstampproc
 		outf = os.path.join(self.WORKDIR,envir.HALOG_F)
+		outfd = open(outf,'w')
 
 		#collect journal from systemd
 		self.collect_journal(self.WORKDIR)
@@ -149,43 +318,33 @@ class node:
 			if not os.path.isfile(envir.HA_LOG):
 				utillib.warning(envir.HA_LOG+' not found; We will try to find log ourselves')
 			envir.HA_LOG = ''
-		
-		if envir.HA_LOG == '':
+		if not len(envir.HA_LOG):
 			envir.HA_LOG = self.findlog()
 
-		if len(envir.HA_LOG) or not os.path.isfile(envir.HA_LOG):
+		if not len(envir.HA_LOG) or not os.path.isfile(envir.HA_LOG):
 			if len(envir.CTS):
 				#argvment is envir.CTS
 				msg = self.cts_findlogseg()
-
-				fd = open(outf,"a")
-				fd.write(msg)
-				fd.close()
+				outfd.write(msg)
 			else:
 				utillib.warning('no log at'+self.WE)
 				return 
 		if not envir.FROM_TIME:
 			utillib.warning("a log found; but we cannot slice it")
-			utillib.warning("please check the time you input")
+			utillib.warning("please check the from time you input")
+		
 		elif len(envir.CTS):
 			#argvment is envir.CTS and envir.HA_LOG
 			msg = self.cts_findlogseg()
-
-			fd = open(outf,"a")
-			fd.write(msg)
-			fd.close()
+			outfd.write(msg)
 
 		else:
-			global getstampproc
-			getstampproc = utillib.find_getstampproc()
+			getstampproc = utillib.find_getstampproc(self)
 			if len(getstampproc):
 				msg = self.dumplogset()
-				f = open(outf,'a')
-				if not f.write(msg):
-					utillib.fatal('disk full')
+				outfd.write(msg)
 			else:
 				utillib.warning('could not figure out the log format of '+envir.HA_LOG)
-
 
 	def node_need_pwd(self,nodes):
 		pass
@@ -210,7 +369,11 @@ class node:
 			p = Process(target=self.start_slave_collector,args=(n,))
 			p.start()
 
-			self.PIDS.append(p.pid)
+			self.PIDS.append(p)
+
+		#need sure child process run before parent process
+		for p in self.PIDS:
+			p.join()
 
 	def get_pe_state_dir(self):
 		'''
@@ -223,7 +386,7 @@ class node:
 		'''
 		Failed to get PE_STATE_DIR from crmsh
 		'''
-		localstatedir = utillib.dirname(envir.HA_VARLIB)
+		localstatedir = os.path.dirname(envir.HA_VARLIB)
 		found = utillib.find_dir("pengine","/var/lib")
 		files = os.listdir(found)
 		for i in files:
@@ -231,7 +394,7 @@ class node:
 				lastf = os.path.join(found,i)
 
 		if os.path.isfile(lastf):
-			envir.PE_STATE_DIR = utillib.dirname(lastf)
+			envir.PE_STATE_DIR = os.path.dirname(lastf)
 
 		else:
 			for p in ['pacemaker/pengine','pengine','heartbeat/pengine']:
@@ -252,7 +415,7 @@ class node:
 		Failed to get CIB_DIR from crmsh
 		HA_VARKIB is nornally set to {localstatedir}/heartbeat
 		'''
-		localstatedir = utillib.dirname(envir.HA_VARLIB)
+		localstatedir = os.path.dirname(envir.HA_VARLIB)
 		
 		for p in ['pacemaker/cib','heartbeat/crm']:
 			if os.path.isfile(localstatedir+'/'+p+'/cib.xml'):
@@ -265,7 +428,7 @@ class node:
 
 		for f in ptest_progs:
 			if utillib.which(f):
-				return utillib.basename(utillib.which(f))
+				return os.path.basename(utillib.which(f))
 
 
 	def compabitility_pcmk(self):				
@@ -282,7 +445,7 @@ class node:
 			self.get_cib_dir2()
 
 		utillib.debug("setting PCMK_LIB to `dirname $CIB_DIR`")
-		envir.PCMK_LIB = utillib.dirname(envir.CIB_DIR)
+		envir.PCMK_LIB = os.path.dirname(envir.CIB_DIR)
 
 		envir.PTEST = self.echo_ptest_tool()
 
@@ -327,6 +490,20 @@ class node:
 		packages = 'pacemaker libpacemaker3 pacemaker-pygui pacemaker-pymgmt pymgmt-client openais libopenais2 libopenais3 corosync libcorosync4 resource-agents cluster-glue libglue2 ldirectord libqb0 heartbeat heartbeat-common heartbeat-resources libheartbeat2 booth ocfs2-tools ocfs2-tools-o2cb ocfs2console ocfs2-kmp-default ocfs2-kmp-pae ocfs2-kmp-xen ocfs2-kmp-debug ocfs2-kmp-trace drbd drbd-kmp-xen drbd-kmp-pae drbd-kmp-default drbd-kmp-debug drbd-kmp-trace drbd-heartbeat drbd-pacemaker drbd-utils drbd-bash-completion drbd-xen lvm2 lvm2-clvm cmirrord libdlm libdlm2 libdlm3 hawk ruby lighttpd kernel-default kernel-pae kernel-xen glibc'
 		envir.PACKAGES = packages.split(" ")
 
+		event_patterns = '''crmd.*(NEW|LOST)
+pmck.*(lost|memb|LOST|MEMB):
+crmd.*Updating.quorum.status
+crmd.*quorum.(lost|ac?quir)
+lrmd.*(start|stop)
+crmd.*Exec
+stonith-ng.*log_oper.*reboot
+stonithd.*(requests|(Succeeded|Failed).to.STONITH|result=)
+Configuration.validated..Starting.heartbeat
+Corosync.Cluster.Engine
+Executive.Service.RELEASE
+Requesting.shutdown|Shutdown.complete'''
+		envir.EVENT_PATTERNS = event_patterns.split('\n')
+
 		if envir.USER_CLUSTER_TYPE == 'corosync':
 			envir.CONF = '/etc/corosync/corosync.conf'
 			envir.CORES_DIRS.append('/var/lib/corosync')
@@ -338,7 +515,7 @@ class node:
 			envir.CF_SUPPORT = envir.HA_NOARCHBIN+'/ha_cf_support.sh'
 			envir.MEMBERSHIP_TOOL_OPTS = '-H'
 
-		envir.B_CONF = utillib.basename(envir.CONF)
+		envir.B_CONF = os.path.basename(envir.CONF)
 		
 		if not os.path.isfile(envir.CF_SUPPORT):
 			utillib.fatal('no stack specific support:'+envir.CF_SUPPORT)
@@ -364,9 +541,21 @@ class node:
 				utillib.debug('reading log settings from '+envir.LOGD_CF)
 				corosync.get_logd_logvars()
 	
-	def change_to_timestamp(self,time):
-		ds = utils.parse_to_timestamp(time)
-		return ds
+	def change_to_timestamp(self,times):
+		if not len(envir.DATE):
+			if len(times.split()) > 1:
+				date_string = times.split()[0]
+				date = ''.join(re.findall(r'\d+',date_string))
+			else:
+				date =  time.strftime("%Y%m%d")
+			
+			envir.DATE = date
+
+		try:
+			ds = utils.parse_to_timestamp(times)
+			return ds
+		except:
+			return 0
 
 	def import_support(self):
 		global support

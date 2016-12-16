@@ -9,6 +9,7 @@ import StringIO
 import subprocess
 import shutil
 import tempfile
+import stat
 
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
@@ -50,33 +51,25 @@ def warning(msg):
 def info(msg):
 	print >> sys.stderr,socket.gethostname(),"INFO:",msg
 
-def get_value(line,key):
+def get_value(line):
 	'''
 	Base on parameter key to search and get the value in string line
 	'''
+
 	value = line.split("=")
-	value = str(value[1:])
-	value = value[2:len(value)-5]
+	
+	#only want right part of =
+	value = str(value[1])
+
+	#cut off the '}\n'
+	value = value[0:len(value)-2]
+	
+	#if some variable's value composed of other variable
+	#then replace it
+	m = re.search('([A-Z]+_){0,}[A-Z]{1,}',value)
+	if m:
+		value = re.sub('\$([A-Z]+_){0,}[A-Z]{1,}',getattr(envir,m.group()),value)
 	return value
-
-def dirname(path):
-	if path.endswith("/"):
-		path = path[1:len(path)-1]
-
-	index = path.rfind("/")
-	dirname = path[0:index]
-	
-	return dirname
-
-def basename(path):
-	if path.endswith("/"):
-		path = path[1:len(path)-1]
-	
-	index = path.rfind("/")
-	basename = path[index+1:]
-	
-	return basename
-
 
 def get_ocf_directories():
 	'''
@@ -86,16 +79,17 @@ def get_ocf_directories():
 	line = f.readline()
 	while len(line) >0:
 		if line.find("HA_DIR:=") != -1:
-			envir.HA_DIR = get_value(line,"HA_DIR")
-		
+			envir.HA_DIR = get_value(line)
+		#TODO
+		# ha_cf not right
 		if line.find("HA_CF:=") != -1:
-			envir.HA_CF = get_value(line,"HA_CF")
+			envir.HA_CF = get_value(line)
 		
 		if line.find("HA_VARLIB:=") != -1:
-			envir.HA_VARLIB = get_value(line,"HA_VARLIB")
+			envir.HA_VARLIB = get_value(line)
 
 		if line.find("HA_BIN:=") != -1:
-			envir.HA_BIN = get_value(line,"HA_BIN")
+			envir.HA_BIN = get_value(line)
 		line = f.readline()
 
 def logd_getcfvar(pattern):
@@ -278,7 +272,7 @@ def get_nodes():
 		envir.NODE_SOURCE = 'ha.cf'
 	# 5.of the cluster's stopped, try the CIB
 	elif os.path.isfile(envir.CIB_DIR+'/'+envir.CIB_F):
-		utillib.debug('reading node from the archived'+envir.CIB_DIR+'/'+envir.CIB_F)
+		debug('reading node from the archived'+envir.CIB_DIR+'/'+envir.CIB_F)
 		CIB_file = os.path.join(envir.CIB_DIR,envir.CIB_F)
 		get_crm_node()
 		envir.NODE_SOURCE = 'crm'
@@ -496,7 +490,7 @@ def crm_info():
 	return crm_pro.communicate()[0]
 
 
-def do_command(argv):
+def do_command(argv,inp = None):
 	'''
 	call subprocess do 
 	'''
@@ -508,9 +502,9 @@ def do_command(argv):
 		msg = command+' : command not found'
 		return msg
 
-	com_pro = subprocess.Popen(comm_list,stdout = subprocess.PIPE,stderr = subprocess.STDOUT)
+	com_pro = subprocess.Popen(comm_list,stdin = subprocess.PIPE,stdout = subprocess.PIPE,stderr = subprocess.STDOUT)
 
-	msg = com_pro.communicate()[0]
+	msg = com_pro.communicate(inp)[0]
 	return msg
 
 def pkg_ver_deb():
@@ -665,10 +659,10 @@ def dumpstate(workdir):
 
 def getconfig(workdir):
 	if os.path.isfile(envir.CONF):
-		shutil.copyfile(envir.CONF,os.path.join(workdir,basename(envir.CONF)))
+		shutil.copyfile(envir.CONF,os.path.join(workdir,os.path.basename(envir.CONF)))
 	
 	if os.path.isfile(envir.LOGD_CF):
-		shutil.copyfile(envir.LOGD_CF,os.path.join(workdir,basename(envir.LOGD_CF)))
+		shutil.copyfile(envir.LOGD_CF,os.path.join(workdir,os.path.basename(envir.LOGD_CF)))
 
 	if iscrmrunning():
 		dumpstate(workdir)
@@ -689,43 +683,33 @@ def getconfig(workdir):
 		verify_info = do_command(['crm_verify','-V','-x',os.path.join(workdir,envir.CIB_F)])
 		writefile(os.path.join(workdir,envir.CRM_VERIFY_F),verify_info)
 
-def touchfile(time):
+def touchfile(nodes,time):
 	tmp = tempfile.mkstemp()[1]
+	nodes.RM_FILES.append(tmp)
 	os.utime(tmp,(time,time))
 
 	return tmp
 
-def add_tmpfiles(files):
-	if not os.path.isfile(envir.__TMPFLIST):
-		return
-	f = open(envir.__TMPFLIST,'a')
-	f.write(files)
-	f.close
-
-
-def find_files(dirs):
+def find_files(nodes,dirs):
 	from_time = envir.FROM_TIME
 	to_time = envir.TO_TIME
 
 	if from_time <= 0:
 		warning('sorry, can\'t find files based on time if you don\'t supply time')
 		return
-	from_stamp = touchfile(from_time)
+	from_stamp = touchfile(nodes,from_time)
 
 	if not len(from_stamp):
 		warning("Can't create temporary files")
 		return
-	add_tmpfiles(from_stamp)
 	findexp = '-newer '+from_stamp
 
 	if to_time > 0:
-		to_stamp = touchfile(to_time)
+		to_stamp = touchfile(nodes,to_time)
 		
 		if not len(to_stamp):
 			warning("Can't create temporary files")
 			return
-		add_tmpfiles(to_stamp)
-
 		findexp = findexp + ' ! -newer '+to_stamp
 		command = ['find']
 		command.extend(dirs)
@@ -856,20 +840,56 @@ def sanitize_xml_attr(files):
 
 def sanitize_one(files):
 
-	if basename(files) == 'ha.cf':
+	if os.path.basename(files) == 'ha.cf':
 		sanitize_hacf()
 	else:
 		sanitize_xml_attr(files)
 
 def getstamp_syslog(message):
-	return ''.join(message.split()[0:2])
+	if len(message.split())>3:
+		return ' '.join(message.split()[0:3])
+	else:
+		return message
 
-def find_getstampproc(sla,filepath):
+def getstamp_rfc5424(message):
+	if len(message):
+		return message.split()[0]
+
+def getstamp_legacy(message):
+	return message.split()[1].replace('_',' ')
+	
+def find_getstampproc(nodes):
 	'''
 	Now  we do not need to get log from /var/log/messages and /var/log/pacemaker.log
 	'''
-	pass
+	func = ''
+	trycnt = 10
 
+	inf = open(envir.HA_LOG,'r')
+	lines = inf.readlines()
+
+	for l in lines:
+		time = getstamp_syslog(l)
+		if nodes.change_to_timestamp(time):
+			func = 'getstamp_syslog'
+			debug('the log file is in the syslog format')
+			return func
+
+		time = getstamp_rfc5424(l)
+		if nodes.change_to_timestamp(time):
+			func = 'getstamp_rfc5424'
+			debug('the log file is in the rfc5424 format')
+			return func
+
+		time = getstamp_legacy(l)
+		if nodes.change_to_timestamp(time):
+			func = 'getstamp_legacy'
+			debug('the log file is in the legacy format(please consider switching to syslog format)')
+			return func
+		trycnt -= 1
+		if not trycnt:
+			return func
+		
 def remove_files(nodes):
 	for f in nodes.RM_FILES:
 		if os.path.isfile(f):
@@ -877,24 +897,57 @@ def remove_files(nodes):
 		elif os.path.isdir(f):
 			shutil.rmtree(f)
 
+def is_socket(path):
+	'''
+	True if path exists and is socket
+	'''
+	if os.path.exists(path):
+		mode = os.stat(path).st_mode
+		if stat.S_ISSOCK(mode):
+			return True
+	return False
+
+def linetime(nodes,logf,num):
+	log_msg = do_command(['head','-1'],do_command(['tail','-n','+'+str(num),logf]))
+	return nodes.get_ts(log_msg)
+
+def findln_by_time(nodes,logf,tm):
+	first = 1
+	last = int(do_command(['wc','-l',logf]).split()[0])
 	
+	#test variable
+	trycnt = 10
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	while first <= last:
+		mid = (first+last)/2
+#		trycnt = 10
+		while trycnt > 0:
+			tmid = linetime(nodes,logf,str(mid))
+			if tmid:
+				break
+			warning('cannot extract time: '+logf+':'+str(mid)+'; will try next one')
+			trycnt -= 1
+			prevmid = mid
+			while prevmid == mid:
+				first -= first
+				if not first:
+					first = 1
+				last -= 1
+				if last < first:
+					last = first
+					prevmid = mid
+					mid = (last+first)/2
+					if first == last:
+						break
+		if not tmid:
+			warning('giving up on log...')
+			return ''
+		
+		if tmid > tm:
+			last = mid-1
+		elif tmid < tm:
+			first = mid+1
+		else:
+			break
+	
+	return mid

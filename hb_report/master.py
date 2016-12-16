@@ -2,6 +2,7 @@
 # See COPYING for license information.
 
 import	os
+import	re
 import	datetime
 import	sys
 import	getopt
@@ -13,6 +14,9 @@ import	collector
 import	paramiko
 import	tempfile
 import	tarfile
+import	time
+import	shutil
+import	stat
 
 from crmsh	import logtime
 from crmsh	import utils
@@ -169,50 +173,159 @@ class master(node):
 			envir.SSH_USER.append("root")
 			envir.SSH_USER.append("hacluster")
 
-	def analyze_one(self,files):
-		pass
-	
-	def consoli_date(self,files):
-		pass
-	
-	def check_crmvfy(self,files):
-		pass
+	def diffcheck(self,file1,file2,outfd):
+		'''
+		if file1 not as same as file2, return True
+		else return False
+		'''
+		dir1 = os.path.dirname(file1)
+		dir2 = os.path.dirname(file2)
 
-	def check_backtrace(self):
-		pass
+		outf = os.path.join(self.WORKDIR,envir.ANALYSIS_F)
+		if not os.path.isfile(file1):
+			utillib.writefile(outf,file1+' does not exist')
+			return False
 
-	def check_permissions(self):
-		pass
+		if not os.path.isfile(file2):
+			utillib.writefile(outf,file1+' does not exist')
+			return False
+
+		base = os.path.basename(file1)
+
+		if base == envir.CIB_F:
+			if (os.path.isfile(os.path.join(dir1,'RUNNING')) and os.path.isfile(os.path.join(dir2,'RUNNING'))) or (os.path.isfile(os.path.join(dir1,'STOPPED')) and os.path.isfile(os.path.join(dir2,'STOPPED'))):
+				msg = utillib.do_command(['crm_diff','-c','-n',file1,'-o',file2])
+				outfd.write(msg)
+			else:
+				outfd.write('cannot compare cibs from running and stop systems')
+		
+		#confdiff
+		#elif base == envir.B_CONF:
+
+		else:
+			msg = utillib.do_command(['diff','-bBu',file1,file2])
+			outfd.write(msg)
+
+		return len(msg)
+
+	def analyze_one(self,files,outfd):
+		'''
+		if collector return different file then return True
+		else return False
+		'''
+		#RC -- repeat counter
+		RC = 0
+		nodes = ''
+		for n in envir.USER_NODES:
+			if len(nodes):
+				if not self.diffcheck(os.path.join(self.WORKDIR,nodes,files),os.path.join(self.WORKDIR,n,files),outfd):
+					RC += 1
+			else:
+				nodes = n
+
+		return RC
+
 	
+	def check_files(self,outf,files):
+		'''
+		If path exists and is a socket
+		write warning message and path content to analyzed.txt
+		'''
+		for l in LOG_NODES:
+			if utillib.is_socket(os.path.join(self.WORKDIR,l,files)):
+				fd = open(os.path.join(self.WORKDIR,l,files))
+				outf.write('WARN:'+files[0:len(files)-4]+'reported warnings at '+l)
+				outf.write(fd.readlines())
+				fd.close()
+
+	def check_backtrace(self,outf):
+		for l in LOG_NODES:
+			if utillib.is_socket(os.path.join(self.WORKDIR,l,envir.BT_F)):
+				fd = open(os.path.join(self.WORKDIR,l,envir.BT_F))
+				outf.write('WARN: coredumps found at '+l+':')
+				outf.write(fd.readlines())
+				fd.close()
+
+	def check_logs(self,outf):
+		logs = []
+		
+		#change EXTRA_LOGS
+		envir.EXTRA_LOGS.append(envir.HALOG_F)
+
+		outf.write('Log patterns:\n')
+
+		for f in envir.EXTRA_LOGS:
+			if os.path.isfile(os.path.join(self.WORKDIR,os.path.basename(f))):
+				logs.append(os.path.join(self.WORKDIR,os.path.basename(f)))
+			for l in LOG_NODES:
+				if os.path.isfile(os.path.join(self.WORKDIR,l,os.path.basename(f))):
+					logs.append(os.path.join(self.WORKDIR,l,os.path.basename(f)))
+
+		if not len(logs):
+			return
+		for l in logs:
+			fd = open(l,'r')
+			line = fd.readline()
+			while line:
+				for patt in envir.LOG_PATTERNS:
+					if line.find(patt) != -1:
+						outf.write(line)
+					line = fd.readline()
+		#change back
+		envir.EXTRA_LOGS.remove(envir.HALOG_F)
+
+	def consolidate(self,files):
+		'''
+		Remove same file,create symbolic link instead
+		'''
+		try:
+			for l in LOG_NODES:
+				if os.path.isfile(os.path.join(self.WORKDIR,files)):
+					os.remove(os.path.join(self.WORKDIR,l,files))
+				else:
+					shutil.move(os.path.join(self.WORKDIR,l,files),os.path.join(self.WORKDIR,files))
+				os.symlink(os.path.join(self.WORKDIR,files),os.path.join(self.WORKDIR,l,files))
+
+		except IOError:
+			#if no such file 
+			#do not need to remove this file
+			return 
 
 	def analyze(self):
 		'''
 		Check every logs we need are collected
 		'''
 		outf = os.path.join(self.WORKDIR,envir.ANALYSIS_F)
-		f = open(out,'w')
+		fd = open(outf,'w')
 		ana_msg = ''
-		flist = [envir.HOSTCACHE,envi.MEMBERSHIP_F,envir.CIB_F,envir.CRM_MON_F,envir.B_COINF,envir.SYSINFO_F,'logd.cf']
+		flist = [envir.HOSTCACHE,envir.MEMBERSHIP_F,envir.CIB_F,envir.CRM_MON_F,envir.B_CONF,envir.SYSINFO_F,'logd.cf']
+		dirs = LOG_NODES
 
 		for f in flist:
-			msg = 'Diff '+f+'...\n'
-			if f not in os.listdir(self.WORKDIR):
-				ana_msg = ana_msg+'no '+f+':/\n'
-			elif self.analyze_one(f):
-				ana_msg = ana_msg +'OK\n'
+			fd.write('Diff '+f+'...\n')
+			for d in dirs:
+				if f not in os.listdir(os.path.join(self.WORKDIR,d)):
+					fd.write('\t\tno '+f+' on '+d+':/\n')
+			
+			#analyze_one return 0 if file do not exists or all node have this file 
+			#if all node have same file and this file exists
+			#then call consolidate remove extra file
+
+			if self.analyze_one(f,fd) == len(LOG_NODES)-1 and os.path.isfile(os.path.join(self.WORKDIR,dirs[0],f)): 
+				fd.write('OK\n')
 				if f != envir.CIB_F:
 					self.consolidate(f)
-			write(ana_msg)
 
-		self.check_crmvfy()
-		self.check_backtrace()
-		self.check_permissions()
-		self.check_logs()
-
-		f.close()
+		self.check_files(fd,envir.CRM_VERIFY_F)
+		self.check_backtrace(fd)
+		self.check_files(fd,envir.PERMISSIONS_F)
+		self.check_logs(fd)
+		fd.close()
 	
 	def start_slave_collector(self,nodes,port=22,username='root'):
-
+		
+		fdout = open(os.path.join(self.WORKDIR,'output.txt'),'a')
+		fderr = open(os.path.join(self.WORKDIR,'error.txt'),'a')
 		utillib.debug('running class collector function run to collect log on '+nodes)
 
 		paramiko.util.log_to_file('/tmp/paramiko.log')
@@ -223,17 +336,61 @@ class master(node):
 		path = os.path.join(envir.CRM_PATH,'collector.py')
 		utillib.debug(nodes+' collector script path :'+path)
 
-		#need to finish the hb_report path
-		stdin,stdout,stderr = client.exec_command('python ~/hb_report/hb_report __slave')
+		command= 'python '+envir.EXCUTE_PATH+'/hb_report __slave'
+		stdin,stdout,stderr = client.exec_command(command)
 		
-		print nodes,' output :',stdout.read()
-		print nodes,' error: ',stderr.read()
+		outmsg = nodes+ ' output :'+stdout.read()
+		fdout.write(outmsg)
+		fdout.close()
+		errmsg = nodes+ ' error: '+stderr.read()
+		fderr.write(errmsg)
+		fderr.close()
 
-		self.PIDS.append(os.getpid())
+	def events_all(self,logf,outf):
+		epatt= []
+		logf = '/usr/share/crmsh/hb_report/hb_report-Thu-15-Dec-2016/ha-log.txt'
+		logfd = open(logf,'r')
+		lines = logfd.readlines()
+	
+		for patt in envir.EVENT_PATTERNS:
+			epatt.append(patt)
+
+		for l in lines:
+			for patt in epatt:
+				if re.search(patt,l):
+					outf.write(l)
+					break
+			
 
 	def events(self):
-		pass
+		destdir = self.WORKDIR
+		logf = os.path.join(destdir,envir.HALOG_F)
 
+		if os.path.isfile(logf):
+			outf = os.path.join(destdir,'events.txt')
+			outfd = open(outf,'w')
+			self.events_all(logf,outfd)
+			outfd.close()
+
+			infd = open(outf,'r')
+			lines = infd.readlines()
+		
+			for n in LOG_NODES:
+				outfd = open(os.path.join(destdir,n,'events.txt'),'w')
+				for l in lines:
+					if l.split()[1] == n:
+						outfd.write(l)
+				outfd.close()
+		else:
+			logf = os.path.join(destdir,n,envir.HALOG_F)
+			for n in LOG_NODES:
+				if not os.path.isfile(os.path.join(destdir,n,envir.HALOG_F)):
+					continue
+				outf = os.path.join(destdir,n,'events.txt')
+				outfd = open(outf,'w')
+				self.events_all(logf,outfd)
+				outfd.close()
+				
 	def check_if_log_is_empty(self):
 		pass
 
@@ -350,16 +507,20 @@ class master(node):
 
 	def get_result(self):
 
-		for p in self.PIDS:
-			print os.waitpid(p,0)
+#		for p in self.PIDS:
+#			pid, status = os.waitpid(p.pid,0)	
+		global LOG_NODES
+		LOG_NODES = []
 		for n in envir.USER_NODES:
 			if n+'.tar' not in os.listdir(self.WORKDIR):
 				utillib.warning('NOTICE: '+n+' not return logs!')
 			else:
+				LOG_NODES.append(n)	
 				tar = tarfile.open(os.path.join(self.WORKDIR,n+'.tar'),'r:')
 				tar.extractall(path=self.WORKDIR)
 				tar.close()
 				self.RM_FILES.append(os.path.join(self.WORKDIR,n+'.tar'))
+
 
 def run():
 	'''
@@ -371,13 +532,12 @@ def run():
 	utillib.get_ocf_directories()
 
 	mtr = master()
-	envir.__TMPFLIST = tempfile.mkstemp()[1]
 	mtr.analyzed_argvment(sys.argv)
 
 	#who am i
 	mtr.WE= socket.gethostname()
 	envir.MASTER = mtr.WE
-	
+
 	#get WORKDIR
 	mtr.WORKDIR = mtr.mktemp(envir.DEST)
 	mtr.WORKDIR = os.path.join(mtr.WORKDIR,envir.DEST)
@@ -438,7 +598,6 @@ def run():
 	
 	#create xml before collect
 	utillib.creat_xml()
-	
 	#then scp the file to collector
 	for n in envir.USER_NODES:
 
@@ -456,15 +615,17 @@ def run():
 #		 then master analyses result, asks the user to edit the
 #		 problem description template, and print final words
 #
-	mtr.get_result()
 
-	analyze_p = Process(target = mtr.analyze)
-	analyze_p.start()
+	mtr.get_result()
+	Process(target = mtr.analyze).start()
+	Process(target = mtr.events).start()
+
+
 
 #
 #part 6: endgame: 
 #		 remove tmpfiles and logs we do not need
-#
+
 
 	utillib.remove_files(mtr)
 

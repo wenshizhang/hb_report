@@ -1,10 +1,3 @@
-#!/usr/bin/python3.5
-# _*_ coding: utf-8 _*_
-# File Name: envir.py
-# mail: wenshizhang555@hoxmail.com
-# Created Time: Thu 27 Oct 2016 02:00:16 PM CST
-# Description:
-#########################################################################
 import os
 import datetime
 import sys
@@ -26,6 +19,7 @@ TO_TIME = 0
 #log time form
 FROM_T = ''
 TO_T = ''
+DATE = ''
 
 #from command patameters
 NODE_SOURCE = ''
@@ -36,7 +30,7 @@ SSH_OPTS = []
 DEST = ''
 DESTDIR = '.'
 NOW = ''
-CTS = 'TEST'
+CTS = ''
 HA_LOG = ''
 EDITOR = ''
 SANITIZE = []
@@ -116,8 +110,11 @@ XML_NAME = '.env.xml'
 XML_PATH = '/tmp'
 
 #other stuff
-__TMPFLIST = ''
+RM_FILES = []
 PTEST = ''
 MASTER_WORKDIR = ''
 MASTER = ''
+#TODO
+#hb_report excute path need to be finish
+EXCUTE_PATH = '/root/hb_report'
 

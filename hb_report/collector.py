@@ -32,35 +32,18 @@ class collector(node):
 		cluster_version = support.cluster_info()
 		msg = cluster_version
 
-		hbrp_ver = utillib.do_command([envir.HA_NOARCHBIN+'/hb_report','-V'])
-		msg = msg+hbrp_ver
-
-		rsag_ver = utillib.do_grep_file('/usr/lib/ocf/lib/heartbeat/ocf-shellfuncs','Build version:')
-		rsag_ver = 'resource-agents: '+rsag_ver
-		msg = msg + rsag_ver
-
-		crm_version = utillib.crm_info()
-		msg = msg+crm_version
-
-		booth_info = utillib.do_command(['booth','--version'])
-		msg = msg+booth_info
-		
-		pkg_info = utillib.pkg_version()
-		msg = msg + pkg_info
-		f.write(pkg_info)
+		msg = msg + utillib.do_command([envir.HA_NOARCHBIN+'/hb_report','-V'])
+		msg = msg + 'resource-agents: ' + utillib.do_grep_file('/usr/lib/ocf/lib/heartbeat/ocf-shellfuncs','Build version:')
+		msg = msg + utillib.crm_info()
+		msg = msg + utillib.do_command(['booth','--version'])
+		msg = msg + utillib.pkg_version()
 		
 		if envir.SKIP_LVL >= 1:
-			vrf_info = utillib.verify_packages()
-			msg = msg + vrf_info
+			msg = msg + utillib.verify_packages()
 
-		sys_name = 'Platform: '+ platform.system()+'\n'
-		msg = msg+sys_name
-
-		knl_name = 'Kernel release: '+platform.release()+'\n'
-		msg = msg+knl_name
-		
-		arch_name = 'Architecture: '+platform.machine()+'\n'
-		msg = msg+arch_name
+		msg = msg + 'Platform: '+ platform.system()+'\n'
+		msg = msg + 'Kernel release: '+platform.release()+'\n'
+		msg = msg + 'Architecture: '+platform.machine()+'\n'
 
 		if platform.system() == 'Linux':
 			dist_name = utillib.distro()+'\n'
@@ -75,27 +58,13 @@ class collector(node):
 		f = open(os.path.join(self.WORKDIR,envir.SYSSTATS_F),'w')
 
 		msg = msg + self.WE+'\n'
-
-		uptime = utillib.do_command(['uptime'])
-		msg = msg+uptime
-
-		ps_info = utillib.do_command(['ps','axf'])
-		msg = msg+ps_info
-	
-		ps_info = utillib.do_command(['ps','auxw'])
-		msg = msg + ps_info
-
-		top_info = utillib.do_command(['top','-b','-n','1'])
-		msg = msg + top_info
-
-		ip_info = utillib.do_command(['ip','addr'])
-		msg = msg+'\n'+ip_info
-
-		net_info = utillib.do_command(['netstat','-i'])
-		msg = msg +'\n'+net_info
-
-		arp_info = utillib.do_command(['arp','-an'])
-		msg = msg + '\n' + arp_info
+		msg = msg + utillib.do_command(['uptime'])
+#		msg = msg + utillib.do_command(['ps','axf'])
+		msg = msg + utillib.do_command(['ps','auxw'])
+		msg = msg + utillib.do_command(['top','-b','-n','1'])
+		msg = msg + utillib.do_command(['ip','addr'])
+		msg = msg + utillib.do_command(['netstat','-i'])
+		msg = msg + utillib.do_command(['arp','-an'])
 
 		if os.path.isdir('/proc'):
 			cpu_f =open('/proc/cpuinfo','r')
@@ -104,14 +73,9 @@ class collector(node):
 				msg = msg + cpu_info
 				cpu_info = cpu_f.readline()
 
-		scsi_info = utillib.do_command(['lsscsi'])
-		msg = msg +'\n'+ scsi_info
-
-		pci_info = utillib.do_command(['lspci'])
-		msg = msg +'\n'+ pci_info
-
-		mount_info = utillib.do_command(['mount'])
-		msg = msg +'\n' + mount_info
+		msg = msg + utillib.do_command(['lsscsi'])
+		msg = msg + utillib.do_command(['lspci'])
+		msg = msg + utillib.do_command(['mount'])
 
 		#df can block, run in background, allow for 5 seconds
 		df_pro = subprocess.Popen(['df'],stderr = subprocess.STDOUT,stdout = subprocess.PIPE)
@@ -127,7 +91,7 @@ class collector(node):
 		f.close()
 
 	def pe2dot(self,path):
-		pef = utillib.basename(path)
+		pef = os.path.basename(path)
 		if pef.endswith('.bz2'):
 			dotf = pef[0:len(pef)-4]
 
@@ -162,33 +126,29 @@ class collector(node):
 
 		utillib.writefile(output,dlm_file_info)
 
-
-
-
 	def getpeinputs(self,workdir):
 		i = 0
 
 		utillib.debug('looking for PE files in'+envir.PE_STATE_DIR)
-		flist = utillib.find_files(envir.PE_STATE_DIR.split())
+		flist = utillib.find_files(self,envir.PE_STATE_DIR.split())
 		grep_pro = subprocess.Popen(['grep','-v',"[.]last$"],stdin = subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 		flist = grep_pro.communicate(' '.join(flist))[0].split()
 		
 		if len(flist):
-			filename = utillib.basename(envir.PE_STATE_DIR)
+			filename = os.path.basename(envir.PE_STATE_DIR)
 			pengine_dir = os.path.join(workdir,filename)
 			os.mkdir(pengine_dir)
 			for f in flist:
-#				os.symlink(f,os.path.join(pengine_dir,utillib.basename(f)))
 				os.symlink(f,pengine_dir)
-				utillib.do_command(['ln','-s',f,pengine_dir])
+#				utillib.do_command(['ln','-s',f,pengine_dir])
 				i = i + 1
 			utillib.debug('found '+str(i)+' pengine input files in '+envir.PE_STATE_DIR)
 
 		if i >= 20:
 			for f in flist:
 				if not self.skip_lvl(1):
-					path = os.path.join(workdir,utillib.basename(envir.PE_STATE_DIR))
-					path = os.path.join(path,utillib.basename(f))
+					path = os.path.join(workdir,os.path.basename(envir.PE_STATE_DIR))
+					path = os.path.join(path,os.path.basename(f))
 					self.pe2dot(path)
 		else:
 			utillib.debug('too many PE inputs to create dot files')
@@ -201,9 +161,9 @@ class collector(node):
 
 	def getbacktraces(self):
 		flist = []
-		bt_files = utillib.find_files(envir.CORES_DIRS)
+		bt_files = utillib.find_files(self,envir.CORES_DIRS)
 		for f in bt_files:
-			bf = utillib.basename(f)
+			bf = os.path.basename(f)
 			bf_num  = utillib.do_command(['expr','match',bf,'core'])
 			if bf_num > 0:
 				flist.append(f)
@@ -216,10 +176,10 @@ class collector(node):
 
 		for conf in envir.CONFIGURATIONS:
 			if os.path.isfile(conf):
-				shutil.copyfile(conf,os.path.join(dest,utillib.basename(conf)))
+				shutil.copyfile(conf,os.path.join(dest,os.path.basename(conf)))
 			elif os.path.isdir(conf):
 				files = os.listdir(conf)
-				dst = os.path.join(self.WORKDIR,utillib.basename(conf))
+				dst = os.path.join(self.WORKDIR,os.path.basename(conf))
 				os.mkdir(dst)
 				for f in files:
 					src = os.path.join(conf,f)
@@ -237,7 +197,7 @@ class collector(node):
 		from_time = envir.FROM_TIME
 		to_time = envir.TO_TIME
 
-		inpf = utillib.find_files(['/var/lib/corosync'])
+		inpf = utillib.find_files(self,['/var/lib/corosync'])
 
 		if os.path.isfile(' '.join(inpf)):
 			blkbox_info = utillib.do_command(['corosync-blackbox'])
@@ -252,7 +212,7 @@ class collector(node):
 			return False
 
 		utillib.debug('looking for RA trace files in '+trace_dir)
-		sed_pro = subprocess.Popen(['sed',"s,"+utillib.dirname(trace_dir)+"/,,g"],stdin = subprocess.PIPE,stdout = subprocess.PIPE)
+		sed_pro = subprocess.Popen(['sed',"s,"+os.path.dirname(trace_dir)+"/,,g"],stdin = subprocess.PIPE,stdout = subprocess.PIPE)
 		flist = sed_pro.communicate(' '.join(utillib.find_file(trace_dir)))[0].split('\n')
 
 		if len(flist):
@@ -266,9 +226,11 @@ class collector(node):
 		Replace sensitive info with ****
 		'''
 		need_replace_files = []
-		for f in os.path.join(self.WORKDIR,envir.B_CONF).split():
-			if os.path.isfile(f):
-				utillib.sanitize_one(f)
+		for b in envir.B_CONF.split():
+			print b
+			for f in os.path.join(self.WORKDIR,b).split():
+				if os.path.isfile(f):
+					utillib.sanitize_one(f)
 		rc = 0
 
 		try:
@@ -328,7 +290,7 @@ class collector(node):
 				continue
 
 			if l == envir.HA_LOG and l != envir.HALOG_F:
-				os.symlink(envir.HALOG_F,os.path.join(self.WORKDIR,utillib.basename(l)))
+				os.symlink(envir.HALOG_F,os.path.join(self.WORKDIR,os.path.basename(l)))
 				continue
 
 	def return_result(self):
@@ -342,15 +304,17 @@ class collector(node):
 		tar = tarfile.open(tarpath, 'w')
 
 		curr_dir = os.getcwd()
-		os.chdir(utillib.dirname(self.WORKDIR))
-		tar.add(utillib.basename(self.WORKDIR))
+		os.chdir(os.path.dirname(self.WORKDIR))
+		tar.add(os.path.basename(self.WORKDIR))
 		tar.close()
 		
 		os.chdir(curr_dir)
 
-		command = ['scp',tarpath,'-rf','root@'+envir.MASTER+':'+envir.MASTER_WORKDIR]
+		command = ['scp',tarpath,'root@'+envir.MASTER+':'+envir.MASTER_WORKDIR]
+		print command
 
 		msg = utillib.do_command(command)
+		print msg
 
 		self.RM_FILES.append(self.WORKDIR)
 		self.RM_FILES.append(tarpath)
@@ -358,16 +322,15 @@ class collector(node):
 
 
 def run(master_flag):
+
 	sla = collector()
 
 	#if this is master node, then flag THIS_IS_NDOE is 1, else case it is 0
 	sla.THIS_IS_NODE = master_flag
 	
-	#init_tempfiles
-	envir.__TMPFLIST = tempfile.mkstemp()[1]
-
 	#who am i
 	sla.WE = socket.gethostname()
+	print 'start collector on ',sla.WE
 
 	utillib.parse_xml()
 	
